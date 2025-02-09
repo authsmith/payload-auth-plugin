@@ -12,6 +12,7 @@ import PasskeyAuthProvider from "./passkey.js"
 import MicrosoftEntraAuthProvider from "./oidc/microsoft-entra.js"
 import AppleOIDCAuthProvider from "./oidc/apple.js"
 import AppleOAuth2Provider from "./oauth2/apple.js"
+import CustomAuthProvider from "./custom.js"
 export {
   GoogleAuthProvider,
   GitHubAuthProvider,
@@ -27,4 +28,5 @@ export {
   MicrosoftEntraAuthProvider,
   AppleOIDCAuthProvider,
   AppleOAuth2Provider,
+  CustomAuthProvider
 }

@@ -13,6 +13,7 @@ type Provider =
   | "auth0"
   | "discord"
   | "facebook"
+  | "custom"
 
 export function signin(provider: Provider) {
   if (provider === "passkey") {
