@@ -4,9 +4,9 @@ import type {
   ProviderConfig,
 } from "../../types.js"
 
-type GoogleAuthConfig = ProviderConfig
+type SlackAuthConfig = ProviderConfig
 
-function SlackAuthProvider(config: GoogleAuthConfig): OIDCProviderConfig {
+function SlackAuthProvider(config: SlackAuthConfig): OIDCProviderConfig {
   return {
     ...config,
     id: "slack",

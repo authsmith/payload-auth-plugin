@@ -2,6 +2,28 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.5.8] - 2025-02-10
+
+### 🐛 Bug Fixes
+
+- Export types
+
+### ⚙️ Miscellaneous Tasks
+
+- Release v0.5.8
+
+## [0.5.7] - 2025-02-09
+
+### 🐛 Bug Fixes
+
+- Ownership
+- Force lowercased emails
+- Type name
+
+### 📚 Documentation
+
+- Updates
+
 ## [0.5.6] - 2025-01-28
 
 ### 🐛 Bug Fixes
@@ -12,6 +34,7 @@ All notable changes to this project will be documented in this file.
 ### ⚙️ Miscellaneous Tasks
 
 - Release v0.5.6
+- Update changelogs
 
 ## [0.5.5] - 2025-01-23
 

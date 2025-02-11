@@ -19,10 +19,11 @@ function MicrosoftEntraAuthProvider(
     name: "Microsoft Entra",
     algorithm: "oidc",
     profile: (profile): AccountInfo => {
+      const email = profile.email as string
       return {
         sub: profile.sub as string,
         name: profile.name as string,
-        email: profile.email as string,
+        email: email.toLowerCase(),
         picture: profile.picture as string,
       }
     },
