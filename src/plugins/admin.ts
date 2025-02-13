@@ -1,4 +1,4 @@
-import type { Config, Plugin } from "payload"
+import type { Collection, CollectionConfig, Config, Plugin, CollectionAfterDeleteHook } from "payload"
 import { EndpointFactory } from "../core/endpoints.js"
 import { ProvidersConfig } from "../types.js"
 import { PayloadSession } from "../core/session/payload.js"
@@ -73,16 +73,69 @@ export const adminAuthPlugin =
     const mappedProviders = mapProviders(providers)
     const endpoints = new EndpointFactory(mappedProviders)
 
+
+    const addUserCollectionHook = (
+      collections: CollectionConfig[] | undefined,
+      collectionSlug: string,
+      accountsSlug: string | undefined,
+    ): CollectionConfig[] => {
+      
+      if (!collections) return []
+      
+      const userCollectionIndex = collections.findIndex(
+        (collection) => collection.slug === collectionSlug,
+      )
+
+      if (userCollectionIndex === -1) {
+        return collections // Return collections unchanged if not found
+      }
+
+      const afterDeleteHook: CollectionAfterDeleteHook = async ({
+        req,
+        id,
+      }) => {
+        const payload = req.payload
+        const accounts = await payload.find({
+          collection: accountsSlug ?? "accounts",
+          where: { user: { equals: id } },
+        })
+        
+        for (const account of accounts.docs) {
+          await payload.delete({
+            collection: accountsSlug ?? "accounts",
+            id: account.id,
+          })
+        }
+      }
+
+      // Clone the collection to avoid mutating the original
+      const updatedCollection = {
+        ...collections[userCollectionIndex],
+        hooks: {
+          ...collections[userCollectionIndex].hooks,
+          afterDelete: [
+            ...(collections[userCollectionIndex].hooks?.afterDelete ?? []),
+            afterDeleteHook,
+          ],
+        },
+      }
+
+      // Return updated collections with the modified user collection
+      return collections.map((collection, index) =>
+        index === userCollectionIndex ? updatedCollection : collection,
+      )
+    }
+    
     // Create accounts collection if doesn't exists
     config.collections = [
-      ...(config.collections ?? []),
+      ...(addUserCollectionHook(config.collections, config.admin.user!, accounts?.slug) ?? []),
       buildAccountsCollection(
         {
           slug: accounts?.slug ?? "accounts",
           hidden: accounts?.hidden ?? false,
         },
         config.admin.user!,
-      ),
+      )
     ]
 
     config.endpoints = [
