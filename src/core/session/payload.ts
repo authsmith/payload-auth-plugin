@@ -77,6 +77,9 @@ export class PayloadSession {
     }
 
     if (accounts.docs.length > 0) {
+      data["sub"] = accountInfo.sub
+      data["issuerName"] = issuerName
+      data["user"] = userID
       await payload.update({
         collection: this.#collections.accountsCollectionSlug,
         where: {
