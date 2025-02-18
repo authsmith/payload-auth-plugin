@@ -24,7 +24,7 @@ function JumpCloudProvider(config: JumpCloudAuthConfig): OAuth2ProviderConfig {
     algorithm: "oauth2",
     profile: (profile): AccountInfo => {
       return {
-        sub: profile.id as string,
+        sub: profile.email as string,
         name: profile.name as string,
         email: profile.email as string,
         picture: profile.picture as string,
