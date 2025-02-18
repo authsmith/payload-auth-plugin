@@ -18,6 +18,10 @@ export interface ProviderConfig {
    * Oauth provider Client Secret
    */
   client_secret?: string
+   /*
+   * Oauth provider Client Type
+   */
+  client_auth_type?: "client_secret_basic" | "client_secret_post"
   /*
    * Additional parameters you would like to add to query for the provider
    */
@@ -33,8 +37,7 @@ export interface OAuth2ProviderConfig
   extends BaseProviderConfig,
     ProviderConfig {
   authorization_server: AuthorizationServer
-  algorithm: "oauth2",
-  client_auth_type?: "client_secret_basic" | "client_secret_post"
+  algorithm: "oauth2"
 }
 
 export type OAuthProviderConfig = OIDCProviderConfig | OAuth2ProviderConfig
