@@ -15,12 +15,12 @@ type Provider =
   | "facebook"
   | "jumpcloud"
 
-export function signin(provider: Provider) {
+export function signin(provider: Provider, apiBase: string = '/api') {
   if (provider === "passkey") {
     init()
   } else {
     const link = document.createElement("a")
-    link.href = "/api/admin/oauth/authorization/" + provider
+    link.href = `${apiBase}/admin/oauth/authorization/${provider}`
     link.click()
   }
 }
