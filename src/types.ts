@@ -18,6 +18,10 @@ export interface ProviderConfig {
    * Oauth provider Client Secret
    */
   client_secret?: string
+   /*
+   * Oauth provider Client Type
+   */
+  client_auth_type?: "client_secret_basic" | "client_secret_post"
   /*
    * Additional parameters you would like to add to query for the provider
    */
