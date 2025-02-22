@@ -18,14 +18,13 @@ export async function OAuth2Callback(
     throw new MissingOrInvalidSession()
   }
 
-  const { client_id, client_secret, authorization_server, profile, client_auth_type } =
+  const { client_id, client_secret, authorization_server, profile } =
     providerConfig
 
   const client: oauth.Client = {
     client_id,
   }
-
-  const clientAuth = client_auth_type === "client_secret_basic" ? oauth.ClientSecretBasic(client_secret ?? "") : oauth.ClientSecretPost(client_secret ?? "");
+  const clientAuth = oauth.ClientSecretPost(client_secret ?? "")
 
   const current_url = new URL(request.url as string) as URL
   const callback_url = getCallbackURL(
