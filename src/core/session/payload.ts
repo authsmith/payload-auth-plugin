@@ -126,7 +126,7 @@ export class PayloadSession {
 
     const cookies: string[] = []
     cookies.push(
-      `${payload.config.cookiePrefix!}-token=${token};Path=/;HttpOnly;SameSite=lax;Expires=${cookieExpiration.toUTCString()}`,
+      `${payload.config.cookiePrefix!}-token=${token};Path=/;HttpOnly;SameSite=lax;Expires=${cookieExpiration.toString()}`,
     )
     const expired = "Thu, 01 Jan 1970 00:00:00 GMT"
     cookies.push(
