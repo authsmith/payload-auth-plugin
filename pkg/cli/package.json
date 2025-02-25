@@ -1,0 +1,45 @@
+{
+    "name": "payload-auth",
+    "version": "0.5.8",
+    "type": "module",
+    "description": "CLI to install and set up payload-auth-plugin",
+    "author": "Sourab Pramanik<shubpramanik241@gmail.com>",
+    "license": "MIT",
+    "homepage:": "https://github.com/authsmith/payload-auth-plugin",
+    "repository": "git@github.com:authsmith/payload-auth-plugin.git",
+    "bin": {
+        "payload-auth": "./dist/esm/index.js"
+    },
+    "main": "./dist/esm/index.js",
+    "scripts": {
+        "dev": "bun run build && node dist/esm/index.js",
+        "build": "bun run ../../script/build.ts",
+        "format": "bun x prettier --write '**/*.{js,jsx,ts,tsx,json,md,yaml,yml}'",
+        "release": "bun run build && changeset publish"
+    },
+    "dependencies": {
+        "@antfu/ni": "23.3.1",
+        "@clack/prompts": "0.10.0",
+        "commander": "13.1.0",
+        "cosmiconfig": "9.0.0",
+        "execa": "9.5.2",
+        "fs-extra": "11.3.0",
+        "kleur": "4.1.5",
+        "ora": "8.2.0",
+        "prompts": "2.4.2",
+        "ts-morph": "25.0.1",
+        "valibot": "1.0.0-rc.0"
+    },
+    "devDependencies": {
+        "@changesets/cli": "2.27.10",
+        "@tsconfig/node22": "22.0.0",
+        "@types/bun": "latest",
+        "@types/fs-extra": "11.0.4",
+        "@types/prompts": "2.4.9",
+        "git-cliff": "2.7.0",
+        "globals": "^15.14.0",
+        "prettier": "3.4.2",
+        "tsup": "8.3.6",
+        "typescript": "^5.7.3"
+    }
+}

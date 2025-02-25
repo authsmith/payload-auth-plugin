@@ -1,0 +1,83 @@
+{
+  "name": "payload-auth-plugin",
+  "version": "0.5.8",
+  "type": "module",
+  "sideEffects": false,
+  "author": "Sourab Pramanik<shubpramanik241@gmail.com>",
+  "license": "MIT",
+  "homepage:": "https://github.com/authsmith/payload-auth-plugin",
+  "repository": "git@github.com:authsmith/payload-auth-plugin.git",
+  "description": "Authentication plugin for Payload CMS",
+  "main": "dist/esm/index.js",
+  "types": "dist/types/index.d.ts",
+  "keywords": [
+    "payload",
+    "cms",
+    "authsmith",
+    "authentication",
+    "payload-plugin",
+    "typescript",
+    "react",
+    "nextjs",
+    "oauth",
+    "oauth2.0",
+    "oidc",
+    "google",
+    "github",
+    "gitlab",
+    "atlassian",
+    "apple",
+    "facebook",
+    "discord",
+    "auth0",
+    "cognito",
+    "keycloak",
+    "microsoft",
+    "slack",
+    "passkey",
+    "webauthn"
+  ],
+  "exports": {
+    ".": {
+      "import": "./dist/esm/index.js",
+      "types": "./dist/types/index.d.ts"
+    },
+    "./providers": {
+      "import": "./dist/esm/providers/index.js",
+      "types": "./dist/types/providers/index.d.ts"
+    },
+    "./client": {
+      "import": "./dist/esm/client/index.js",
+      "types": "./dist/types/client/index.d.ts"
+    }
+  },
+  "files": [
+    "src",
+    "dist"
+  ],
+  "scripts": {
+    "build": "bun run ../../script/build.ts",
+    "format": "bun x prettier --write '**/*.{js,jsx,ts,tsx,json,md,yaml,yml}'",
+    "release": "bun run build && changeset publish"
+  },
+  "peerDependencies": {
+    "payload": "latest"
+  },
+  "devDependencies": {
+    "@changesets/cli": "2.27.10",
+    "@tsconfig/node22": "22.0.0",
+    "@types/bun": "latest",
+    "@types/jsonwebtoken": "^9.0.7",
+    "cross-env": "^7.0.3",
+    "git-cliff": "2.7.0",
+    "globals": "^15.14.0",
+    "prettier": "3.4.2",
+    "typescript": "^5.7.3"
+  },
+  "dependencies": {
+    "@simplewebauthn/browser": "^13.1.0",
+    "@simplewebauthn/server": "^13.1.0",
+    "jsonwebtoken": "^9.0.2",
+    "oauth4webapi": "^3.1.4"
+  }
+}
