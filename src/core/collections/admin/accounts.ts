@@ -6,51 +6,57 @@ export function buildAccountsCollection(
     slug: string
     hidden: boolean
   },
-  usersCollectionSlug: string,
+  relationConfig: {
+    fieldName: string
+    relationTo: string
+    hasMany: boolean
+    required: boolean
+    label: string
+  }
 ) {
   const accountsCollection: CollectionConfig = {
     slug: account.slug,
     admin: {
       useAsTitle: "id",
-      hidden: account.hidden,
+      hidden: account.hidden
     },
     access: {
       read: ({ req: { user } }) => Boolean(user),
       create: () => false,
       update: () => false,
-      delete: () => false,
+      delete: () => false
     },
     fields: [
       {
         name: "name",
-        type: "text",
+        type: "text"
       },
       {
         name: "picture",
-        type: "text",
+        type: "text"
       },
       {
-        name: "user",
+        name: relationConfig.fieldName,
         type: "relationship",
-        relationTo: usersCollectionSlug,
-        hasMany: false,
-        required: true,
-        label: "User",
+        relationTo: relationConfig.relationTo,
+        ...(relationConfig.hasMany ? { hasMany: true } : { hasMany: false }),
+        required: relationConfig.required,
+        label: relationConfig.label
       },
       {
         name: "issuerName",
         type: "text",
         required: true,
-        label: "Issuer Name",
+        label: "Issuer Name"
       },
       {
         name: "scope",
-        type: "text",
+        type: "text"
       },
       {
         name: "sub",
         type: "text",
-        required: true,
+        required: true
       },
       {
         name: "passkey",
@@ -62,10 +68,10 @@ export function buildAccountsCollection(
               return true
             }
             return false
-          },
-        },
-      },
-    ],
+          }
+        }
+      }
+    ]
   }
   return accountsCollection
 }

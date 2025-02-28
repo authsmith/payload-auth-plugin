@@ -10,7 +10,7 @@ class AuthError extends Error {
 export class InvalidServerURL extends AuthError {
   constructor() {
     super(
-      "Missing or invalid server URL. Please set serverURL in your Payload config",
+      "Missing or invalid server URL. Please set serverURL in your Payload config"
     )
   }
 }
@@ -29,7 +29,7 @@ export class ProviderAlreadyExists extends AuthError {
 export class InvalidOAuthAlgorithm extends AuthError {
   constructor() {
     super(
-      "Invalid OAuth Algorithm. Plugin only support OIDC and OAuth2 algorithms",
+      "Invalid OAuth Algorithm. Plugin only support OIDC and OAuth2 algorithms"
     )
   }
 }
@@ -73,6 +73,12 @@ export class InvalidCredentials extends AuthError {
 export class MissingUsersCollection extends AuthError {
   constructor() {
     super("Missing users collection")
+  }
+}
+
+export class MissingCollectionError extends AuthError {
+  constructor(message: string) {
+    super(message)
   }
 }
 
