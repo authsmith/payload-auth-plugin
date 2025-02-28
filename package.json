@@ -1,6 +1,6 @@
 {
   "name": "@vladanilicjs/payload-auth-plugin",
-  "version": "0.5.8",
+  "version": "0.5.9",
   "type": "module",
   "sideEffects": false,
   "author": "Vladan Ilic <vladanilic017@gmail.com>",

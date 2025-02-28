@@ -53,11 +53,17 @@ export class PayloadSession {
         throw new UserNotFound()
       }
 
+      // Extract name parts if available
+      const nameParts = this.#extractNameParts(accountInfo.name);
+
       // Create a new entity in the related collection
       const newEntity = await payload.create({
         collection: relationTo,
         data: {
           [collectionField]: accountInfo.email,
+          // Add name fields if they exist in the collection
+          ...(nameParts.firstName ? { firstName: nameParts.firstName } : {}),
+          ...(nameParts.lastName ? { lastName: nameParts.lastName } : {}),
           // Add any other required fields based on the collection
           ...(relationTo === "users" ? {
             emailVerified: true,
@@ -78,10 +84,16 @@ export class PayloadSession {
       },
     })
     
+    // Extract name parts for the account record
+    const nameParts = this.#extractNameParts(accountInfo.name);
+    
     const data: Record<string, unknown> = {
       scope,
       name: accountInfo.name,
       picture: accountInfo.picture,
+      email: accountInfo.email,
+      ...(nameParts.firstName ? { firstName: nameParts.firstName } : {}),
+      ...(nameParts.lastName ? { lastName: nameParts.lastName } : {})
     }
 
     // Add passkey payload for auth
@@ -114,6 +126,22 @@ export class PayloadSession {
       })
     }
     return relatedEntityID
+  }
+  
+  // Helper method to extract first and last name from a full name
+  #extractNameParts(fullName: string): { firstName?: string; lastName?: string } {
+    if (!fullName) return {};
+    
+    const parts = fullName.trim().split(/\s+/);
+    if (parts.length === 1) {
+      return { firstName: parts[0] };
+    } else if (parts.length > 1) {
+      const firstName = parts[0];
+      const lastName = parts.slice(1).join(' ');
+      return { firstName, lastName };
+    }
+    
+    return {};
   }
   
   async createSession(

@@ -1,4 +1,4 @@
-import type { Config, Plugin } from "payload"
+import type { Config, Plugin, Field } from "payload"
 import { EndpointFactory } from "../core/endpoints.js"
 import { ProvidersConfig } from "../types.js"
 import { PayloadSession } from "../core/session/payload.js"
@@ -26,6 +26,8 @@ interface PluginOptions {
   accounts?: {
     slug?: string | undefined
     hidden?: boolean | undefined
+    // Add support for custom fields
+    additionalFields?: Field[]
   }
 
   /* 
@@ -109,6 +111,7 @@ export const adminAuthPlugin =
         {
           slug: accounts?.slug ?? "accounts",
           hidden: accounts?.hidden ?? false,
+          additionalFields: accounts?.additionalFields
         },
         {
           fieldName: relationConfig.fieldName,

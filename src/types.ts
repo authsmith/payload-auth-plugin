@@ -43,6 +43,8 @@ export interface AccountInfo {
   name: string
   picture: string
   email: string
+  firstName?: string
+  lastName?: string
   passKey?: {
     credentialId: string
     publicKey?: Uint8Array
