@@ -8,6 +8,5 @@
     "module": "NodeNext",
     "moduleResolution": "NodeNext"
   },
-  "include": ["src"],
-  "@payload-config": ["./payload.config.ts"]
+  "include": ["src"]
 }
