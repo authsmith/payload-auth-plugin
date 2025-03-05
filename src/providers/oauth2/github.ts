@@ -4,6 +4,7 @@ import type {
   AccountInfo,
   ProviderConfig,
 } from "../../types.js"
+import { enhancedProfileMapper } from "../utils.js"
 
 const authorization_server: oauth.AuthorizationServer = {
   issuer: "https://github.com",
@@ -23,12 +24,12 @@ function GitHubAuthProvider(config: GitHubAuthConfig): OAuth2ProviderConfig {
     name: "GitHub",
     algorithm: "oauth2",
     profile: (profile): AccountInfo => {
-      return {
-        sub: profile.id as string,
-        name: profile.name as string,
-        email: profile.email as string,
-        picture: profile.picture as string,
-      }
+      return enhancedProfileMapper(profile, {
+        subField: "id",
+        nameField: "name",
+        emailField: "email",
+        pictureField: "avatar_url",
+      })
     },
   }
 }

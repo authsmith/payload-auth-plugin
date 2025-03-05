@@ -1,12 +1,19 @@
 import { BasePayload, getCookieExpiration } from "payload"
 import { UserNotFound } from "../errors/consoleErrors.js"
-import jwt from "jsonwebtoken"
+import * as jwt from "jsonwebtoken"
 import { AccountInfo } from "../../types.js"
 import { hashCode } from "../utils/hash.js"
 
 type Collections = {
   accountsCollectionSlug: string
-  usersCollectionSlug: string
+  relationConfig: {
+    fieldName: string
+    relationTo: string
+    collectionField: string
+    hasMany: boolean
+    required: boolean
+    label: string
+  }
 }
 
 export class PayloadSession {
@@ -28,48 +35,68 @@ export class PayloadSession {
     issuerName: string,
     payload: BasePayload,
   ) {
-    let userID: string | number
+    let relatedEntityID: string | number;
+    const { relationTo, collectionField, fieldName } = this.#collections.relationConfig;
 
-    const userQueryResults = await payload.find({
-      collection: this.#collections.usersCollectionSlug,
+    // Query the related collection to find an entity matching the email
+    const entityQueryResults = await payload.find({
+      collection: relationTo,
       where: {
-        email: {
+        [collectionField]: {
           equals: accountInfo.email,
         },
       },
     })
 
-    if (userQueryResults.docs.length === 0) {
+    if (entityQueryResults.docs.length === 0) {
       if (!this.#allowSignUp) {
         throw new UserNotFound()
       }
 
-      const newUser = await payload.create({
-        collection: this.#collections.usersCollectionSlug,
+      // Extract name parts if available
+      const nameParts = this.#extractNameParts(accountInfo.name);
+
+      // Create a new entity in the related collection
+      const newEntity = await payload.create({
+        collection: relationTo,
         data: {
-          email: accountInfo.email,
-          emailVerified: true,
-          password: hashCode(accountInfo.email + payload.secret).toString(),
+          [collectionField]: accountInfo.email,
+          // Add name fields if they exist in the collection
+          ...(nameParts.firstName ? { firstName: nameParts.firstName } : {}),
+          ...(nameParts.lastName ? { lastName: nameParts.lastName } : {}),
+          // Add any other required fields based on the collection
+          ...(relationTo === "users" ? {
+            emailVerified: true,
+            password: hashCode(accountInfo.email + payload.secret).toString(),
+          } : {})
         },
       })
-      userID = newUser.id
+      relatedEntityID = newEntity.id
     } else {
-      userID = userQueryResults.docs[0].id as string
+      relatedEntityID = entityQueryResults.docs[0].id as string
     }
 
+    // Check if the account already exists
     const accounts = await payload.find({
       collection: this.#collections.accountsCollectionSlug,
       where: {
         sub: { equals: accountInfo.sub },
       },
     })
+    
+    // Extract name parts for the account record
+    const nameParts = this.#extractNameParts(accountInfo.name);
+    
     const data: Record<string, unknown> = {
       scope,
       name: accountInfo.name,
       picture: accountInfo.picture,
+      email: accountInfo.email,
+      ...(nameParts.firstName ? { firstName: nameParts.firstName } : {}),
+      ...(nameParts.lastName ? { lastName: nameParts.lastName } : {})
     }
 
-    // // Add passkey payload for auth
+    // Add passkey payload for auth
     if (issuerName === "Passkey" && accountInfo.passKey) {
       data["passkey"] = {
         ...accountInfo.passKey,
@@ -79,7 +106,7 @@ export class PayloadSession {
     if (accounts.docs.length > 0) {
       data["sub"] = accountInfo.sub
       data["issuerName"] = issuerName
-      data["user"] = userID
+      data[fieldName] = relatedEntityID
       await payload.update({
         collection: this.#collections.accountsCollectionSlug,
         where: {
@@ -92,31 +119,51 @@ export class PayloadSession {
     } else {
       data["sub"] = accountInfo.sub
       data["issuerName"] = issuerName
-      data["user"] = userID
+      data[fieldName] = relatedEntityID
       await payload.create({
         collection: this.#collections.accountsCollectionSlug,
         data,
       })
     }
-    return userID
+    return relatedEntityID
   }
+  
+  // Helper method to extract first and last name from a full name
+  #extractNameParts(fullName: string): { firstName?: string; lastName?: string } {
+    if (!fullName) return {};
+    
+    const parts = fullName.trim().split(/\s+/);
+    if (parts.length === 1) {
+      return { firstName: parts[0] };
+    } else if (parts.length > 1) {
+      const firstName = parts[0];
+      const lastName = parts.slice(1).join(' ');
+      return { firstName, lastName };
+    }
+    
+    return {};
+  }
+  
   async createSession(
     accountInfo: AccountInfo,
     scope: string,
     issuerName: string,
     payload: BasePayload,
   ) {
-    const userID = await this.#upsertAccount(
+    const relatedEntityID = await this.#upsertAccount(
       accountInfo,
       scope,
       issuerName,
       payload,
     )
 
+    // Determine the collection to use in the JWT token
+    const collectionForToken = this.#collections.relationConfig.relationTo;
+
     const fieldsToSign = {
-      id: userID,
+      id: relatedEntityID,
       email: accountInfo.email,
-      collection: this.#collections.usersCollectionSlug,
+      collection: collectionForToken,
     }
 
     const cookieExpiration = getCookieExpiration({
