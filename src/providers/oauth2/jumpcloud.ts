@@ -2,7 +2,7 @@ import type * as oauth from "oauth4webapi"
 import type {
   OAuth2ProviderConfig,
   AccountInfo,
-  ProviderConfig,
+  OAuthBaseProviderConfig,
 } from "../../types.js"
 
 const authorization_server: oauth.AuthorizationServer = {
@@ -12,15 +12,15 @@ const authorization_server: oauth.AuthorizationServer = {
   userinfo_endpoint: "https://oauth.id.jumpcloud.com/userinfo",
 }
 
-type JumpCloudAuthConfig = ProviderConfig
+type JumpCloudAuthConfig = OAuthBaseProviderConfig
 
 function JumpCloudProvider(config: JumpCloudAuthConfig): OAuth2ProviderConfig {
   return {
     ...config,
-    id: "jumpcloud",
+    id: "jumpCloud",
     scope: "openid email profile",
     authorization_server,
-    name: "JumpCloud",
+    name: "Jump Cloud",
     algorithm: "oauth2",
     profile: (profile): AccountInfo => {
       return {
