@@ -14,12 +14,10 @@ type Provider =
   | "discord"
   | "facebook"
 
-export function signin(provider: Provider, apiBase: string = '/api') {
+export function signin(provider: Provider, apiBase: string = "/api") {
   if (provider === "passkey") {
     init()
   } else {
-    const link = document.createElement("a")
-    link.href = `${apiBase}/admin/oauth/authorization/${provider}`
-    link.click()
+    window.location.href = `${apiBase}/admin/oauth/authorization/${provider}`
   }
 }
