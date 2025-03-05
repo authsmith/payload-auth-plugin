@@ -41,7 +41,14 @@ interface OAuthProviderOutput {
 export interface OAuthBaseProviderConfig {
   client_id: string
   client_secret?: string
-  params?: Record<string, string> | undefined
+  /*
+   * Oauth provider Client Type
+   */
+  client_auth_type?: "client_secret_basic" | "client_secret_post"
+  /*
+   * Additional parameters you would like to add to query for the provider
+   */
+  params?: Record<string, string>
 }
 
 export interface OIDCProviderConfig
