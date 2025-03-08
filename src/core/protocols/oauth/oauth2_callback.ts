@@ -5,6 +5,7 @@ import { getCallbackURL } from "../../utils/cb.js"
 import { MissingOrInvalidSession } from "../../errors/consoleErrors.js"
 
 export async function OAuth2Callback(
+  pluginType: string,
   request: PayloadRequest,
   providerConfig: OAuth2ProviderConfig,
   session_callback: (oauthAccountInfo: AccountInfo) => Promise<Response>,
@@ -30,7 +31,7 @@ export async function OAuth2Callback(
   const current_url = new URL(request.url as string) as URL
   const callback_url = getCallbackURL(
     request.payload.config.serverURL,
-    "admin",
+    pluginType,
     providerConfig.id,
   )
   const as = authorization_server

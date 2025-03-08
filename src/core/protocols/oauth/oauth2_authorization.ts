@@ -4,12 +4,13 @@ import { getCallbackURL } from "../../utils/cb.js"
 import { PayloadRequest } from "payload"
 
 export async function OAuth2Authorization(
+  pluginType: string,
   request: PayloadRequest,
   providerConfig: OAuth2ProviderConfig,
 ): Promise<Response> {
   const callback_url = getCallbackURL(
     request.payload.config.serverURL,
-    "admin",
+    pluginType,
     providerConfig.id,
   )
   const code_verifier = oauth.generateRandomCodeVerifier()

@@ -5,6 +5,7 @@ import { getCallbackURL } from "../../utils/cb.js"
 import { MissingOrInvalidSession } from "../../errors/consoleErrors.js"
 
 export async function OIDCCallback(
+  pluginType: string,
   request: PayloadRequest,
   providerConfig: OIDCProviderConfig,
   session_callback: (oauthAccountInfo: AccountInfo) => Promise<Response>,
@@ -29,7 +30,7 @@ export async function OIDCCallback(
   const current_url = new URL(request.url as string) as URL
   const callback_url = getCallbackURL(
     request.payload.config.serverURL,
-    "admin",
+    pluginType,
     providerConfig.id,
   )
   const issuer_url = new URL(issuer) as URL

@@ -1,2 +1,3 @@
 import { adminAuthPlugin } from "./plugins/admin.js"
-export { adminAuthPlugin }
+import { appAuthPlugin } from "./plugins/app.js"
+export { adminAuthPlugin, appAuthPlugin }

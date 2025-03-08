@@ -16,6 +16,12 @@ export class MissingEmailAPIError extends AuthAPIError {
   }
 }
 
+export class UserNotFoundAPIError extends AuthAPIError {
+  constructor() {
+    super("User not found")
+  }
+}
+
 export class EmailNotFoundAPIError extends AuthAPIError {
   constructor() {
     super("Now user found with this email", 404)
@@ -25,5 +31,11 @@ export class EmailNotFoundAPIError extends AuthAPIError {
 export class PasskeyVerificationAPIError extends AuthAPIError {
   constructor() {
     super("Passkey verification failed", 403)
+  }
+}
+
+export class InvalidAPIRequest extends AuthAPIError {
+  constructor() {
+    super("Invalid API request", 400)
   }
 }

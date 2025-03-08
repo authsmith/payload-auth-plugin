@@ -1,10 +1,10 @@
 import type {
   AccountInfo,
   OIDCProviderConfig,
-  ProviderConfig,
+  OAuthBaseProviderConfig,
 } from "../../types.js"
 
-type MicrosoftEntraAuthConfig = ProviderConfig & {
+type MicrosoftEntraAuthConfig = OAuthBaseProviderConfig & {
   tenant_id: string
 }
 
@@ -18,6 +18,7 @@ function MicrosoftEntraAuthProvider(
     issuer: `https://login.microsoftonline.com/${config.tenant_id}/v2.0`,
     name: "Microsoft Entra",
     algorithm: "oidc",
+    kind: "oauth",
     profile: (profile): AccountInfo => {
       const email = profile.email as string
       return {

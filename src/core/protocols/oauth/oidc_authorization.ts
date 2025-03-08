@@ -2,15 +2,15 @@ import * as oauth from "oauth4webapi"
 import type { OIDCProviderConfig } from "../../../types.js"
 import { getCallbackURL } from "../../utils/cb.js"
 import { PayloadRequest } from "payload"
-import { stringWidth } from "bun"
 
 export async function OIDCAuthorization(
+  pluginType: string,
   request: PayloadRequest,
   providerConfig: OIDCProviderConfig,
 ): Promise<Response> {
   const callback_url = getCallbackURL(
     request.payload.config.serverURL,
-    "admin",
+    pluginType,
     providerConfig.id,
   )
   const code_verifier = oauth.generateRandomCodeVerifier()

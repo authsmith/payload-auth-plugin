@@ -1,7 +1,7 @@
-import { Glob, $ } from "bun"
+import { Glob, $ } from "bun";
 
-await $`rm -rf dist`
-const files = new Glob("./src/**/*.{ts,tsx}").scan()
+await $`rm -rf dist`;
+const files = new Glob("./src/**/*.{ts,tsx}").scan();
 for await (const file of files) {
   await Bun.build({
     format: "esm",
@@ -9,6 +9,6 @@ for await (const file of files) {
     external: ["*"],
     root: "src",
     entrypoints: [file],
-  })
+  });
 }
-await $`tsc --outDir dist/types --declaration --emitDeclarationOnly --declarationMap`
+await $`tsc --outDir dist/types --declaration --emitDeclarationOnly --declarationMap`;

@@ -2,7 +2,7 @@ import type * as oauth from "oauth4webapi"
 import type {
   OAuth2ProviderConfig,
   AccountInfo,
-  ProviderConfig,
+  OAuthBaseProviderConfig,
 } from "../../types.js"
 
 const authorization_server: oauth.AuthorizationServer = {
@@ -11,7 +11,7 @@ const authorization_server: oauth.AuthorizationServer = {
   token_endpoint: "https://discord.com/api/oauth2/token",
   userinfo_endpoint: "https://discord.com/api/users/@me",
 }
-type DiscordAuthConfig = ProviderConfig
+type DiscordAuthConfig = OAuthBaseProviderConfig
 
 function DiscordAuthProvider(config: DiscordAuthConfig): OAuth2ProviderConfig {
   return {
@@ -21,6 +21,7 @@ function DiscordAuthProvider(config: DiscordAuthConfig): OAuth2ProviderConfig {
     authorization_server,
     name: "Discord",
     algorithm: "oauth2",
+    kind: "oauth",
     profile: (profile): AccountInfo => {
       const format = profile.avatar.toString().startsWith("a_") ? "gif" : "png"
 

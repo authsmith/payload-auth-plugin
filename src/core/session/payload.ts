@@ -3,6 +3,7 @@ import { UserNotFound } from "../errors/consoleErrors.js"
 import jwt from "jsonwebtoken"
 import { AccountInfo } from "../../types.js"
 import { hashCode } from "../utils/hash.js"
+import { invalidateOAuthCookies } from "../utils/cookies.js"
 
 type Collections = {
   accountsCollectionSlug: string
@@ -127,23 +128,11 @@ export class PayloadSession {
       expiresIn: new Date(cookieExpiration).getTime(),
     })
 
-    const cookies: string[] = []
+    let cookies: string[] = []
     cookies.push(
       `${payload.config.cookiePrefix!}-token=${token};Path=/;HttpOnly;SameSite=lax;Expires=${cookieExpiration.toUTCString()}`,
     )
-    const expired = "Thu, 01 Jan 1970 00:00:00 GMT"
-    cookies.push(
-      `__session-oauth-state=; Path=/; HttpOnly; SameSite=Lax; Expires=${expired}`,
-    )
-    cookies.push(
-      `__session-oauth-nonce=; Path=/; HttpOnly; SameSite=Lax; Expires=${expired}`,
-    )
-    cookies.push(
-      `__session-code-verifier=; Path=/; HttpOnly; SameSite=Lax; Expires=${expired}`,
-    )
-    cookies.push(
-      `__session-webpk-challenge=; Path=/; HttpOnly; SameSite=Lax; Expires=${expired}`,
-    )
+    cookies = invalidateOAuthCookies(cookies)
 
     let redirectURL = payload.getAdminURL()
     if (this.#successPath) {

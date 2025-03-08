@@ -1,13 +1,16 @@
-import type { Config, Plugin } from "payload"
-import { EndpointFactory } from "../core/endpoints.js"
-import { ProvidersConfig } from "../types.js"
+import type { BasePayload, Config, Endpoint, Plugin } from "payload"
+import {
+  EndpointsFactory,
+  OAuthEndpointStrategy,
+  PasskeyEndpointStrategy,
+} from "../core/endpoints.js"
+import type { AccountInfo, ProvidersConfig } from "../types.js"
 import { PayloadSession } from "../core/session/payload.js"
 import {
   InvalidServerURL,
   MissingUsersCollection,
 } from "../core/errors/consoleErrors.js"
-import { buildAccountsCollection } from "../core/collections/admin/accounts.js"
-import { mapProviders } from "../providers/utils.js"
+import { getOAuthProviders, getPasskeyProvider } from "../providers/utils.js"
 
 interface PluginOptions {
   /* Enable or disable plugin
@@ -70,41 +73,48 @@ export const adminAuthPlugin =
       allowSignUp,
       successPath,
     )
-    const mappedProviders = mapProviders(providers)
-    const endpoints = new EndpointFactory(mappedProviders)
 
-    // Create accounts collection if doesn't exists
-    config.collections = [
-      ...(config.collections ?? []),
-      buildAccountsCollection(
-        {
-          slug: accounts?.slug ?? "accounts",
-          hidden: accounts?.hidden ?? false,
-        },
-        config.admin.user!,
-      ),
-    ]
+    const oauthProviders = getOAuthProviders(providers)
+    const passkeyProvider = getPasskeyProvider(providers)
 
-    config.endpoints = [
-      ...(config.endpoints ?? []),
-      ...endpoints.payloadOAuthEndpoints({
-        sessionCallback: (oauthAccountInfo, scope, issuerName, basePayload) =>
+    const endpointsFactory = new EndpointsFactory("admin")
+
+    let oauthEndpoints: Endpoint[] = []
+    let passkeyEndpoints: Endpoint[] = []
+
+    if (Object.keys(oauthProviders).length > 0) {
+      endpointsFactory.registerStrategy(
+        "oauth",
+        new OAuthEndpointStrategy(oauthProviders),
+      )
+      oauthEndpoints = endpointsFactory.createEndpoints("oauth", {
+        sessionCallback: (
+          oauthAccountInfo: AccountInfo,
+          scope: string,
+          issuerName: string,
+          basePayload: BasePayload,
+        ) =>
           session.createSession(
             oauthAccountInfo,
             scope,
             issuerName,
             basePayload,
           ),
-      }),
-    ]
-    if (mappedProviders["passkey"]) {
-      config.endpoints.push(
-        ...endpoints.payloadPasskeyEndpoints({
-          rpID: "localhost",
-          sessionCallback: (accountInfo, issuerName, basePayload) =>
-            session.createSession(accountInfo, "", issuerName, basePayload),
-        }),
-      )
+      })
     }
+
+    if (passkeyProvider) {
+      endpointsFactory.registerStrategy(
+        "passkey",
+        new PasskeyEndpointStrategy(),
+      )
+      passkeyEndpoints = endpointsFactory.createEndpoints("passkey")
+    }
+
+    config.endpoints = [
+      ...(config.endpoints ?? []),
+      ...oauthEndpoints,
+      ...passkeyEndpoints,
+    ]
     return config
   }
