@@ -2,10 +2,10 @@ import type * as oauth from "oauth4webapi"
 import type {
   OAuth2ProviderConfig,
   AccountInfo,
-  ProviderConfig,
+  OAuthBaseProviderConfig,
 } from "../../types.js"
 
-interface Auth0AuthConfig extends ProviderConfig {
+interface Auth0AuthConfig extends OAuthBaseProviderConfig {
   domain: string
 }
 
@@ -25,6 +25,7 @@ function Auth0AuthProvider(config: Auth0AuthConfig): OAuth2ProviderConfig {
     authorization_server,
     name: "Auth0",
     algorithm: "oauth2",
+    kind: "oauth",
     profile: (profile): AccountInfo => {
       return {
         sub: profile.sub as string,

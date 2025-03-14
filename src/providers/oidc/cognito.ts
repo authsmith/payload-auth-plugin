@@ -1,10 +1,10 @@
 import type {
   AccountInfo,
   OIDCProviderConfig,
-  ProviderConfig,
+  OAuthBaseProviderConfig,
 } from "../../types.js"
 
-interface CognitoAuthConfig extends ProviderConfig {
+interface CognitoAuthConfig extends OAuthBaseProviderConfig {
   domain: string
   region: string
 }
@@ -18,6 +18,7 @@ function CognitoAuthProvider(config: CognitoAuthConfig): OIDCProviderConfig {
     issuer: `https://${domain}/${region}`,
     name: "Congnito",
     algorithm: "oidc",
+    kind: "oauth",
     profile: (profile): AccountInfo => {
       return {
         sub: profile.sub as string,

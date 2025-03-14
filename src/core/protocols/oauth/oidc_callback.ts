@@ -5,6 +5,7 @@ import { getCallbackURL } from "../../utils/cb.js"
 import { MissingOrInvalidSession } from "../../errors/consoleErrors.js"
 
 export async function OIDCCallback(
+  pluginType: string,
   request: PayloadRequest,
   providerConfig: OIDCProviderConfig,
   session_callback: (oauthAccountInfo: AccountInfo) => Promise<Response>,
@@ -29,7 +30,7 @@ export async function OIDCCallback(
   const current_url = new URL(request.url as string) as URL
   const callback_url = getCallbackURL(
     request.payload.config.serverURL,
-    "admin",
+    pluginType,
     providerConfig.id,
   )
   const issuer_url = new URL(issuer) as URL
@@ -40,7 +41,7 @@ export async function OIDCCallback(
 
   const params = oauth.validateAuthResponse(as, client, current_url)
 
-  const response = await oauth.authorizationCodeGrantRequest(
+  const grantResponse = await oauth.authorizationCodeGrantRequest(
     as,
     client,
     clientAuth,
@@ -48,6 +49,13 @@ export async function OIDCCallback(
     callback_url.toString(),
     code_verifier,
   )
+
+  let body = (await grantResponse.json()) as { scope: string | string[] }
+  let response = new Response(JSON.stringify(body), grantResponse)
+  if (Array.isArray(body.scope)) {
+    body.scope = body.scope.join(" ")
+    response = new Response(JSON.stringify(body), grantResponse)
+  }
 
   const token_result = await oauth.processAuthorizationCodeResponse(
     as,

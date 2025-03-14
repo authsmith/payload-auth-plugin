@@ -1,10 +1,10 @@
 import type {
   AccountInfo,
   OIDCProviderConfig,
-  ProviderConfig,
+  OAuthBaseProviderConfig,
 } from "../../types.js"
 
-interface KeyCloakAuthConfig extends ProviderConfig {
+interface KeyCloakAuthConfig extends OAuthBaseProviderConfig {
   realm: string
   domain: string
   identifier: string
@@ -20,6 +20,7 @@ function KeyCloakAuthProvider(config: KeyCloakAuthConfig): OIDCProviderConfig {
     issuer: `https://${domain}/realms/${realm}`,
     name,
     algorithm: "oidc",
+    kind: "oauth",
     profile: (profile): AccountInfo => {
       return {
         sub: profile.sub as string,

@@ -1,24 +1,68 @@
 import type { AuthorizationServer } from "oauth4webapi"
 
-interface BaseProviderConfig {
+export enum ErrorKind {
+  NotFound = "NotFound",
+  InternalServer = "InternalServer",
+  BadRequest = "BadRequest",
+  NotAuthorized = "NotAuthorized",
+  NotAuthenticated = "NotAuthenticated",
+  Conflict = "Conflict",
+}
+
+export enum SuccessKind {
+  Created = "Created",
+  Updated = "Updated",
+  Retrieved = "Retrieved",
+  Deleted = "Deleted",
+}
+export interface AuthPluginOutput {
+  message: string
+  kind: ErrorKind | SuccessKind
+  data: any
+}
+
+/**
+ * Generic OAuth provider callback output
+ *
+ * @interface OAuthProviderOutput
+ * @internal
+ */
+interface OAuthProviderOutput {
+  /**
+   * OAuth Provider ID. Usually the slugified provider name
+   *
+   * @type {string}
+   */
   id: string
+  /**
+   * OAuth provider name. For example Google, Apple
+   *
+   * @type {string}
+   */
   name: string
+  /**
+   * Scope of account attributes to request from the provider
+   *
+   * @type {string}
+   */
   scope: string
+
+  /**
+   * Profile callback that returns account information requried to link with users
+   *
+   * @type {(
+   *     profile: Record<string, string | number | boolean | object>,
+   *   ) => AccountInfo}
+   */
   profile: (
     profile: Record<string, string | number | boolean | object>,
   ) => AccountInfo
 }
 
-export interface ProviderConfig {
-  /*
-   * Oauth provider Client ID
-   */
+export interface OAuthBaseProviderConfig {
   client_id: string
-  /*
-   * Oauth provider Client Secret
-   */
   client_secret?: string
-   /*
+  /*
    * Oauth provider Client Type
    */
   client_auth_type?: "client_secret_basic" | "client_secret_post"
@@ -28,16 +72,20 @@ export interface ProviderConfig {
   params?: Record<string, string>
 }
 
-export interface OIDCProviderConfig extends BaseProviderConfig, ProviderConfig {
+export interface OIDCProviderConfig
+  extends OAuthProviderOutput,
+    OAuthBaseProviderConfig {
   issuer: string
   algorithm: "oidc"
+  kind: "oauth"
 }
 
 export interface OAuth2ProviderConfig
-  extends BaseProviderConfig,
-    ProviderConfig {
+  extends OAuthProviderOutput,
+    OAuthBaseProviderConfig {
   authorization_server: AuthorizationServer
   algorithm: "oauth2"
+  kind: "oauth"
 }
 
 export type OAuthProviderConfig = OIDCProviderConfig | OAuth2ProviderConfig
@@ -57,14 +105,15 @@ export interface AccountInfo {
   }
 }
 
-export type CredentialsProviderConfig = {
+export type PasswordProviderConfig = {
   id: string
-  name: string
-  verfiyEmail?: boolean
-  passwordless?: boolean
-  mfa?: "OTP" | "TOTP" | "None"
-  signinCallback?: () => void
-  signupCallback?: () => void
+  kind: "password"
+  // name: string
+  // verfiyEmail?: boolean
+  // passwordless?: boolean
+  // mfa?: "OTP" | "TOTP" | "None"
+  // signinCallback?: () => void
+  // signupCallback?: () => void
 }
 
 export interface CredentialsAccountInfo {
@@ -74,6 +123,12 @@ export interface CredentialsAccountInfo {
 
 export type PasskeyProviderConfig = {
   id: string
+  kind: "passkey"
 }
 
-export type ProvidersConfig = OAuthProviderConfig | PasskeyProviderConfig
+export type ProvidersConfig =
+  | OAuthProviderConfig
+  | PasskeyProviderConfig
+  | PasswordProviderConfig
+
+export type AuthenticationStrategy = "Cookie"

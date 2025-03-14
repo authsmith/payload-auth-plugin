@@ -1,5 +1,5 @@
 import { startRegistration } from "@simplewebauthn/browser"
-export async function registration(email: string) {
+export const registration = async (email: string) => {
   try {
     const resp = await fetch(
       "/api/admin/passkey/generate-registration-options",

@@ -4,7 +4,7 @@ import { authentication } from "./authentication.js"
 
 //NOTE: EXPERIMENTAL
 
-export async function init() {
+export const init = async () => {
   if (!browserSupportsWebAuthn()) {
     console.log(
       "It seems this browser does not support WebAuthn/Passkey. Reach out to the plugin author",

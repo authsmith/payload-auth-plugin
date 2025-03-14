@@ -49,6 +49,14 @@
     "./client": {
       "import": "./dist/esm/client/index.js",
       "types": "./dist/types/client/index.d.ts"
+    },
+    "./collection": {
+      "import": "./dist/esm/collection/index.js",
+      "types": "./dist/types/collection/index.d.ts"
+    },
+    "./collection/hooks": {
+      "import": "./dist/esm/collection/hooks.js",
+      "types": "./dist/types/collection/hooks.d.ts"
     }
   },
   "files": [
@@ -56,10 +64,9 @@
     "dist"
   ],
   "scripts": {
-    "build": "bun run script/build.ts",
-    "format": "./script/format",
-    "release": "bun run build && changeset publish",
-    "changelog": "./script/changelog.sh"
+    "build": "bun run ./script/build.ts",
+    "format": "bun x prettier --write '**/*.{js,jsx,ts,tsx,json,md,yaml,yml}'",
+    "release": "bun run build && changeset publish"
   },
   "peerDependencies": {
     "payload": "latest"
@@ -78,7 +85,8 @@
   "dependencies": {
     "@simplewebauthn/browser": "^13.1.0",
     "@simplewebauthn/server": "^13.1.0",
-    "jsonwebtoken": "^9.0.2",
-    "oauth4webapi": "^3.1.4"
+    "jose": "6.0.8",
+    "oauth4webapi": "^3.1.4",
+    "qs-esm": "7.0.2"
   }
 }

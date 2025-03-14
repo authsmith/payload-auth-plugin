@@ -11,6 +11,7 @@ import { OIDCCallback } from "../protocols/oauth/oidc_callback.js"
 import { OAuth2Callback } from "../protocols/oauth/oauth2_callback.js"
 
 export function OAuthHandlers(
+  pluginType: string,
   request: PayloadRequest,
   resource: string,
   provider: OAuthProviderConfig,
@@ -24,18 +25,18 @@ export function OAuthHandlers(
     case "authorization":
       switch (provider.algorithm) {
         case "oidc":
-          return OIDCAuthorization(request, provider)
+          return OIDCAuthorization(pluginType, request, provider)
         case "oauth2":
-          return OAuth2Authorization(request, provider)
+          return OAuth2Authorization(pluginType, request, provider)
         default:
           throw new InvalidOAuthAlgorithm()
       }
     case "callback":
       switch (provider.algorithm) {
         case "oidc":
-          return OIDCCallback(request, provider, sessionCallBack)
+          return OIDCCallback(pluginType, request, provider, sessionCallBack)
         case "oauth2":
-          return OAuth2Callback(request, provider, sessionCallBack)
+          return OAuth2Callback(pluginType, request, provider, sessionCallBack)
         default:
           throw new InvalidOAuthAlgorithm()
       }

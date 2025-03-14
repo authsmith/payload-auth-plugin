@@ -1,5 +1,5 @@
 import type { PayloadRequest } from "payload"
-import { InvalidPasskeyRequest } from "../errors/consoleErrors.js"
+import { InvalidAPIRequest } from "../errors/apiErrors.js"
 import { InitPasskey } from "../protocols/passkey/index.js"
 import { AccountInfo } from "../../types.js"
 import {
@@ -29,6 +29,6 @@ export function PasskeyHandlers(
     case "verify-authentication":
       return VerifyPasskeyAuthentication(request, rpID, sessionCallBack)
     default:
-      throw new InvalidPasskeyRequest()
+      throw new InvalidAPIRequest()
   }
 }

@@ -13,6 +13,7 @@ function AppleOIDCAuthProvider(config: AppleAuthConfig): OIDCProviderConfig {
     issuer: "https://appleid.apple.com",
     name: "Apple",
     algorithm: "oidc",
+    kind: "oauth",
     profile: (profile): AccountInfo => {
       return {
         sub: profile.sub as string,

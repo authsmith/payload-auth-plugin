@@ -1,26 +1,26 @@
-import { init } from "./passkey/index.js"
+import { passwordSignin, PasswordSigninPayload } from "./password.js"
+import { oauth, OauthProvider, OauthSigninOptions } from "./oauth.js"
+import { init as passkeyInit } from "./passkey/index.js"
+interface BaseOptions {
+  name: string
+}
 
-type Provider =
-  | "google"
-  | "github"
-  | "passkey"
-  | "apple"
-  | "cognito"
-  | "gitlab"
-  | "msft-entra"
-  | "slack"
-  | "atlassian"
-  | "auth0"
-  | "discord"
-  | "facebook"
-  | "jumpcloud"
+export const appSignin = (options: BaseOptions) => {
+  return {
+    oauth: (provider: OauthProvider, oauthSigniOptions?: OauthSigninOptions) =>
+      oauth(options, provider, oauthSigniOptions),
+    passkey: () => passkeyInit(),
+    password: async (payload: PasswordSigninPayload) =>
+      await passwordSignin(options, payload),
+  }
+}
 
-export function signin(provider: Provider, apiBase: string = '/api') {
-  if (provider === "passkey") {
-    init()
-  } else {
-    const link = document.createElement("a")
-    link.href = `${apiBase}/admin/oauth/authorization/${provider}`
-    link.click()
+export const adminSignin = () => {
+  return {
+    oauth: (provider: OauthProvider, oauthSigniOptions?: OauthSigninOptions) =>
+      oauth({ name: "admin" }, provider, oauthSigniOptions),
+    passkey: () => {
+      passkeyInit()
+    },
   }
 }

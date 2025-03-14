@@ -2,7 +2,7 @@ import type * as oauth from "oauth4webapi"
 import type {
   OAuth2ProviderConfig,
   AccountInfo,
-  ProviderConfig,
+  OAuthBaseProviderConfig,
 } from "../../types.js"
 
 const authorization_server: oauth.AuthorizationServer = {
@@ -13,7 +13,7 @@ const authorization_server: oauth.AuthorizationServer = {
     "https://graph.facebook.com/me?fields=id,name,email,picture",
 }
 
-type FacebookAuthConfig = ProviderConfig
+type FacebookAuthConfig = OAuthBaseProviderConfig
 
 function FacebookAuthProvider(
   config: FacebookAuthConfig,
@@ -25,6 +25,7 @@ function FacebookAuthProvider(
     authorization_server,
     name: "Facebook",
     algorithm: "oauth2",
+    kind: "oauth",
     profile: (profile): AccountInfo => {
       let picture
 

@@ -1,7 +1,7 @@
 import { startAuthentication } from "@simplewebauthn/browser"
 import { AuthenticatorTransportFuture } from "@simplewebauthn/server"
 
-export async function authentication(
+export const authentication = async (
   passkey: {
     backedUp: boolean
     counter: 0
@@ -11,7 +11,7 @@ export async function authentication(
     transports: AuthenticatorTransportFuture[]
   },
   email: string,
-) {
+) => {
   const resp = await fetch(
     "/api/admin/passkey/generate-authentication-options",
     {
