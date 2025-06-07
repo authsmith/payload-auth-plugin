@@ -13,9 +13,8 @@ export async function OAuth2Callback(
 
   const code_verifier = parsedCookies.get("__session-code-verifier")
   const state = parsedCookies.get("__session-oauth-state")
-  const clientOrigin = parsedCookies.get("__session-client-origin")
 
-  if (!code_verifier || !clientOrigin) {
+  if (!code_verifier) {
     throw new MissingOrInvalidSession()
   }
 
@@ -44,7 +43,7 @@ export async function OAuth2Callback(
   )
   const as = authorization_server
 
-  const params = oauth.validateAuthResponse(as, client, current_url, state!)
+  const params = oauth.validateAuthResponse(as, client, current_url, state)
 
   const grantResponse = await oauth.authorizationCodeGrantRequest(
     as,
@@ -54,7 +53,7 @@ export async function OAuth2Callback(
     callback_url.toString(),
     code_verifier,
   )
-  let body = (await grantResponse.json()) as { scope: string | string[] }
+  const body = (await grantResponse.json()) as { scope: string | string[] }
   let response = new Response(JSON.stringify(body), grantResponse)
   if (Array.isArray(body.scope)) {
     body.scope = body.scope.join(" ")
@@ -74,12 +73,29 @@ export async function OAuth2Callback(
   )
   const userInfo = (await userInfoResponse.json()) as Record<string, string>
 
-  const authorizationURL = new URL(
+  const authenticationURL = new URL(
     `${request.origin}/api/${pluginType}/oauth/authentication/${providerConfig.id}`,
   )
-  const res = new Response(JSON.stringify({ process: "oauth" }), {
+
+  authenticationURL.searchParams.set("sub", userInfo.sub)
+  authenticationURL.searchParams.set(
+    "email",
+    encodeURIComponent(userInfo.email),
+  )
+  authenticationURL.searchParams.set("name", userInfo.name ?? "")
+  authenticationURL.searchParams.set("scope", providerConfig.scope)
+  authenticationURL.searchParams.set(
+    "issuer",
+    encodeURIComponent(providerConfig.authorization_server.issuer),
+  )
+  authenticationURL.searchParams.set(
+    "picture",
+    encodeURIComponent(userInfo.picture ?? ""),
+  )
+  const res = new Response(null, {
+    status: 302,
     headers: {
-      Location: authorizationURL.href,
+      Location: authenticationURL.href,
     },
   })
 

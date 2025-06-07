@@ -1,7 +1,7 @@
 import * as oauth from "oauth4webapi"
 import type { OAuth2ProviderConfig } from "../../../types.js"
 import { getCallbackURL } from "../../utils/cb.js"
-import { PayloadRequest } from "payload"
+import type { PayloadRequest } from "payload"
 
 export async function OAuth2Authorization(
   pluginType: string,
@@ -28,7 +28,7 @@ export async function OAuth2Authorization(
   const cookies: string[] = []
   const cookieMaxage = new Date(Date.now() + 300 * 1000)
 
-  const authorizationURL = new URL(as.authorization_endpoint!)
+  const authorizationURL = new URL(as.authorization_endpoint as string)
   authorizationURL.searchParams.set("client_id", client.client_id)
   authorizationURL.searchParams.set("redirect_uri", callback_url.toString())
   authorizationURL.searchParams.set("response_type", "code")
@@ -68,9 +68,8 @@ export async function OAuth2Authorization(
     },
   })
 
-  cookies.forEach((cookie) => {
-    res.headers.append("Set-Cookie", cookie)
-  })
-
+  for (const c of cookies) {
+    res.headers.append("Set-Cookie", c)
+  }
   return res
 }

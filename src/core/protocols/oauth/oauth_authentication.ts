@@ -1,8 +1,7 @@
 import {
-  BasePayload,
-  JsonObject,
+  type JsonObject,
   parseCookies,
-  TypeWithID,
+  type TypeWithID,
   type PayloadRequest,
 } from "payload"
 import {
@@ -25,18 +24,22 @@ export async function OAuthAuthentication(
   },
   allowOAuthAutoSignUp: boolean,
   useAdmin: boolean,
+  secret: string,
   request: PayloadRequest,
+  successRedirectPath: string,
+  errorRedirectPath: string,
 ): Promise<Response> {
   const sub = request.searchParams.get("sub")
-  const email = request.searchParams.get("email")
+  let email = request.searchParams.get("email")
   const name = request.searchParams.get("name")
   const scope = request.searchParams.get("scope")
-  const issuer = request.searchParams.get("issuer")
-  const picture = request.searchParams.get("picture")
-
+  const issuer = decodeURIComponent(request.searchParams.get("issuer") ?? "")
+  const picture = decodeURIComponent(request.searchParams.get("picture") ?? "")
   if (!sub || !email || !scope || !issuer) {
     return new InvalidRequestBodyError()
   }
+
+  email = decodeURIComponent(email)
 
   const { payload } = request
   const userRecords = await payload.find({
@@ -48,33 +51,20 @@ export async function OAuthAuthentication(
     },
   })
   let userRecord: JsonObject & TypeWithID
-
   if (userRecords.docs.length === 1) {
     userRecord = userRecords.docs[0]
   } else if (allowOAuthAutoSignUp) {
-    let data: Record<string, unknown> = {
+    const data: Record<string, unknown> = {
       email: email,
     }
     const hasAuthEnabled = Boolean(
       payload.collections[collections.usersCollection].config.auth,
     )
     if (hasAuthEnabled) {
-      data["password"] = jose.base64url.encode(
+      data.password = jose.base64url.encode(
         crypto.getRandomValues(new Uint8Array(16)),
       )
     }
-
-    const cookies = parseCookies(request.headers)
-    if (cookies.has("oauth_profile")) {
-      const profileData = JSON.parse(
-        decodeURIComponent(cookies.get("oauth_profile")!),
-      )
-      data = {
-        ...data,
-        ...profileData,
-      }
-    }
-
     const userRecords = await payload.create({
       collection: collections.usersCollection,
       data,
@@ -88,7 +78,7 @@ export async function OAuthAuthentication(
     scope,
     name: name,
     picture: picture,
-    issuer,
+    issuerName: issuer,
   }
 
   const accountRecords = await payload.find({
@@ -97,7 +87,6 @@ export async function OAuthAuthentication(
       sub: { equals: sub },
     },
   })
-
   if (accountRecords.docs && accountRecords.docs.length === 1) {
     await payload.update({
       collection: collections.accountsCollection,
@@ -105,8 +94,8 @@ export async function OAuthAuthentication(
       data,
     })
   } else {
-    data["sub"] = sub
-    data["user"] = userRecord["id"]
+    data.sub = sub
+    data.user = userRecord.id
     await payload.create({
       collection: collections.accountsCollection,
       data,
@@ -116,35 +105,29 @@ export async function OAuthAuthentication(
   let cookies: string[] = []
 
   const cookieName = useAdmin
-    ? `${payload.config.cookiePrefix!}-token`
+    ? `${payload.config.cookiePrefix}-token`
     : `__${pluginType}-${APP_COOKIE_SUFFIX}`
-
-  const secret = payload.secret
-
   cookies = [
     ...(await createSessionCookies(cookieName, secret, {
-      id: userRecord["id"],
+      id: userRecord.id,
       email: email,
       collection: collections.usersCollection,
     })),
   ]
-
   cookies = invalidateOAuthCookies(cookies)
-
-  const res = new Response(
-    JSON.stringify({
-      message: "Authenticated successfully",
-      kind: SuccessKind.Created,
-      isSuccess: true,
-      isError: false,
-    }),
-    {
-      status: 200,
-    },
+  const successRedirectionURL = new URL(
+    `${request.origin}${successRedirectPath}`,
   )
-
-  cookies.forEach((cookie) => {
-    res.headers.append("Set-Cookie", cookie)
+  const res = new Response(null, {
+    status: 302,
+    headers: {
+      Location: successRedirectionURL.href,
+    },
   })
+
+  for (const c of cookies) {
+    res.headers.append("Set-Cookie", c)
+  }
+
   return res
 }

@@ -1,4 +1,4 @@
-import { PasswordSignupPayload, passwordSignup } from "./password.js"
+import { type PasswordSignupPayload, passwordSignup } from "./password.js"
 
 interface BaseOptions {
   name: string

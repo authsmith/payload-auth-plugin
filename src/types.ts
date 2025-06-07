@@ -18,7 +18,7 @@ export enum SuccessKind {
 export interface AuthPluginOutput {
   message: string
   kind: ErrorKind | SuccessKind
-  data: any
+  data: unknown
   isSuccess: boolean
   isError: boolean
 }

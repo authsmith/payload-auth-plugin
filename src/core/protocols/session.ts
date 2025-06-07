@@ -1,4 +1,4 @@
-import { parseCookies, PayloadRequest } from "payload"
+import { parseCookies, type PayloadRequest } from "payload"
 import {
   UnauthorizedAPIRequest,
   UserNotFoundAPIError,
@@ -37,9 +37,10 @@ export const SessionRefresh = async (
       status: 201,
     },
   )
-  refreshCookies.forEach((cookie) => {
-    res.headers.append("Set-Cookie", cookie)
-  })
+  for (const c of refreshCookies) {
+    res.headers.append("Set-Cookie", c)
+  }
+
   return res
 }
 

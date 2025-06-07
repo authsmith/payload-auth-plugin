@@ -1,0 +1,12 @@
+@import '~@payloadcms/ui/scss';
+
+.oauth-container {
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  column-gap: 4px;
+}
+.oauth-btn {
+  padding-block: 8px;
+  width: 100%;
+}

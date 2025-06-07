@@ -1,7 +1,7 @@
 'use client'
 
 import React from 'react'
-import { signin } from 'payload-auth-plugin/client'
+import { register } from 'payload-auth-plugin/client'
 import { Button } from '@/components/ui/button'
 import { z } from 'zod'
 import { useForm } from 'react-hook-form'
@@ -17,31 +17,36 @@ import {
 import { Input } from '@/components/ui/input'
 import { toast } from 'sonner'
 
-const signinFormSchema = z.object({
+const signupFormSchema = z.object({
   email: z.string().min(2).max(50),
   password: z.string(),
+  first_name: z.string().optional(),
+  last_name: z.string().optional(),
 })
 
 const Page = () => {
-  const form = useForm<z.infer<typeof signinFormSchema>>({
-    resolver: zodResolver(signinFormSchema),
+  const form = useForm<z.infer<typeof signupFormSchema>>({
+    resolver: zodResolver(signupFormSchema),
     defaultValues: {
       email: '',
       password: '',
+      first_name: '',
+      last_name: '',
     },
   })
 
-  const { oauth, password } = signin({ name: 'app' })
+  const { password } = register({ name: 'app' })
 
-  const handleGoogleSignin = async () => {
-    await oauth('google')
-  }
-  const handleTwitchSignin = async () => {
-    await oauth('twitch')
-  }
-
-  const handleSignin = async (value: z.infer<typeof signinFormSchema>) => {
-    const res = await password({ email: value.email, password: value.password })
+  const handleSignup = async (value: z.infer<typeof signupFormSchema>) => {
+    const res = await password({
+      email: value.email,
+      password: value.password,
+      userInfo: {
+        first_name: value.first_name,
+        last_name: value.last_name,
+      },
+      allowAutoSignin: true,
+    })
     if (res.isError) {
       toast.error(res.message)
     }
@@ -51,7 +56,33 @@ const Page = () => {
       <div className="space-y-8 w-full max-w-[440px] mx-auto">
         <div className="space-y-2">
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(handleSignin)} className="space-y-8">
+            <form onSubmit={form.handleSubmit(handleSignup)} className="space-y-8">
+              <FormField
+                control={form.control}
+                name="first_name"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>First Name</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Enter your first name" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="last_name"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Last Name</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Enter your last name" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
               <FormField
                 control={form.control}
                 name="email"
@@ -80,21 +111,10 @@ const Page = () => {
               />
 
               <Button type="submit" className="w-full">
-                Sign In
+                Sign Up
               </Button>
             </form>
           </Form>
-        </div>
-        <div className="w-full">
-          <p className="text-md w-full text-center">OR</p>
-        </div>
-        <div className="space-y-4">
-          <Button type="button" onClick={handleGoogleSignin} className="w-full">
-            Continue with Google
-          </Button>
-          <Button type="button" onClick={handleTwitchSignin} className="w-full">
-            Continue with Twitch
-          </Button>
         </div>
       </div>
     </div>

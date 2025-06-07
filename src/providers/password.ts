@@ -1,4 +1,4 @@
-import { PasswordProviderConfig } from "../types.js"
+import type { PasswordProviderConfig } from "../types.js"
 
 function PasswordProvider(): PasswordProviderConfig {
   return {

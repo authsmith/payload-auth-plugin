@@ -52,6 +52,12 @@ export class MissingOrInvalidParams extends PluginError {
   }
 }
 
+export class MissingSecret extends PluginError {
+  constructor() {
+    super("Missing secret in the options")
+  }
+}
+
 export class AuthenticationFailed extends PluginError {
   constructor() {
     super("Failed to authenticate")

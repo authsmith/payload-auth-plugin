@@ -1,4 +1,4 @@
-import { CollectionConfig, Field } from "payload"
+import type { CollectionConfig, Field } from "payload"
 import { MissingCollectionSlug } from "../core/errors/consoleErrors.js"
 
 /**
@@ -39,7 +39,7 @@ export const withUsersCollection = (
       type: "number",
     },
   ]
-  if (!collectionConfig.fields.some((field) => field.type === "email")) {
+  if (!incomingCollection.fields?.find((field) => field.type === "email")) {
     baseFields.push({
       name: "email",
       type: "email",
