@@ -1,4 +1,4 @@
-import { AuthPluginOutput } from "../types.js"
+import { SuccessKind, type AuthPluginOutput } from "../types.js"
 
 interface BaseOptions {
   name: string
@@ -17,6 +17,16 @@ export const passwordSignin = async (
     body: JSON.stringify(payload),
   })
 
+  if (response.redirected) {
+    window.location.href = response.url
+    return {
+      data: {},
+      message: "Redirecting user...",
+      kind: SuccessKind.Retrieved,
+      isError: false,
+      isSuccess: true,
+    }
+  }
   const { data, message, kind, isError, isSuccess } =
     (await response.json()) as AuthPluginOutput
   return {
@@ -32,7 +42,7 @@ export interface PasswordSignupPayload {
   email: string
   password: string
   allowAutoSignin?: boolean
-  profile?: Record<string, unknown>
+  userInfo?: Record<string, unknown>
 }
 
 export const passwordSignup = async (
@@ -43,7 +53,16 @@ export const passwordSignup = async (
     method: "POST",
     body: JSON.stringify(payload),
   })
-
+  if (response.redirected) {
+    window.location.href = response.url
+    return {
+      data: {},
+      message: "Redirecting user...",
+      kind: SuccessKind.Retrieved,
+      isError: false,
+      isSuccess: true,
+    }
+  }
   const { data, message, kind, isError, isSuccess } =
     (await response.json()) as AuthPluginOutput
   return {
@@ -82,7 +101,6 @@ export const forgotPassword = async (
 }
 
 export interface PasswordRecoverPayload {
-  email: string
   password: string
   code: string
 }

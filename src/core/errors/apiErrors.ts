@@ -45,7 +45,7 @@ export class UserNotFoundAPIError extends AuthAPIError {
 
 export class EmailNotFoundAPIError extends AuthAPIError {
   constructor() {
-    super("Now user found with this email", ErrorKind.BadRequest)
+    super("No user found with this email", ErrorKind.BadRequest)
   }
 }
 
@@ -88,5 +88,20 @@ export class InvalidRequestBodyError extends AuthAPIError {
 export class EmailAlreadyExistError extends AuthAPIError {
   constructor() {
     super("Email is already taken", ErrorKind.Conflict)
+  }
+}
+
+export class InternalServerError extends AuthAPIError {
+  constructor() {
+    super("Something went wrong. Server failure", ErrorKind.BadRequest)
+  }
+}
+
+export class MissingOrInvalidVerification extends AuthAPIError {
+  constructor() {
+    super(
+      "Verifcation failed. Missing or invalid verification code.",
+      ErrorKind.BadRequest,
+    )
   }
 }

@@ -1,5 +1,5 @@
 import type { PayloadRequest } from "payload"
-import type { AccountInfo, OAuthProviderConfig } from "../../types.js"
+import type { OAuthProviderConfig } from "../../types.js"
 import {
   InvalidOAuthAlgorithm,
   InvalidOAuthResource,
@@ -21,12 +21,15 @@ export function OAuthHandlers(
   secret: string,
   useAdmin: boolean,
   request: PayloadRequest,
-  resource: string,
   provider: OAuthProviderConfig,
+  successRedirectPath: string,
+  errorRedirectPath: string,
 ): Promise<Response> {
   if (!provider) {
     throw new InvalidProvider()
   }
+
+  const resource = request.routeParams?.resource as string
 
   switch (resource) {
     case "authorization":
@@ -34,7 +37,7 @@ export function OAuthHandlers(
         case "oidc":
           return OIDCAuthorization(pluginType, request, provider)
         case "oauth2":
-          return OAuth2Authorization(pluginType, request, provider, clientOrigin)
+          return OAuth2Authorization(pluginType, request, provider)
         default:
           throw new InvalidOAuthAlgorithm()
       }
@@ -53,7 +56,10 @@ export function OAuthHandlers(
         collections,
         allowOAuthAutoSignUp,
         useAdmin,
+        secret,
         request,
+        successRedirectPath,
+        errorRedirectPath,
       )
     default:
       throw new InvalidOAuthResource()

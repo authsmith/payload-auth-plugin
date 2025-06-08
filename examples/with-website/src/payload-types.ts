@@ -73,6 +73,8 @@ export interface Config {
     categories: Category;
     adminUsers: AdminUser;
     adminAccounts: AdminAccount;
+    appUsers: AppUser;
+    appUserAccounts: AppUserAccount;
     redirects: Redirect;
     forms: Form;
     'form-submissions': FormSubmission;
@@ -90,6 +92,8 @@ export interface Config {
     categories: CategoriesSelect<false> | CategoriesSelect<true>;
     adminUsers: AdminUsersSelect<false> | AdminUsersSelect<true>;
     adminAccounts: AdminAccountsSelect<false> | AdminAccountsSelect<true>;
+    appUsers: AppUsersSelect<false> | AppUsersSelect<true>;
+    appUserAccounts: AppUserAccountsSelect<false> | AppUserAccountsSelect<true>;
     redirects: RedirectsSelect<false> | RedirectsSelect<true>;
     forms: FormsSelect<false> | FormsSelect<true>;
     'form-submissions': FormSubmissionsSelect<false> | FormSubmissionsSelect<true>;
@@ -771,6 +775,64 @@ export interface AdminAccount {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "appUsers".
+ */
+export interface AppUser {
+  id: string;
+  email: string;
+  last_name?: string | null;
+  first_name?: string | null;
+  hashedPassword?: string | null;
+  hashSalt?: string | null;
+  hashIterations?: number | null;
+  verificationCode?: string | null;
+  verificationHash?: string | null;
+  verificationTokenExpire?: number | null;
+  verificationKind?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "appUserAccounts".
+ */
+export interface AppUserAccount {
+  id: string;
+  name?: string | null;
+  picture?: string | null;
+  user: string | AppUser;
+  issuerName: string;
+  scope?: string | null;
+  sub: string;
+  passkey?: {
+    credentialId: string;
+    publicKey:
+      | {
+          [k: string]: unknown;
+        }
+      | unknown[]
+      | string
+      | number
+      | boolean
+      | null;
+    counter: number;
+    transports:
+      | {
+          [k: string]: unknown;
+        }
+      | unknown[]
+      | string
+      | number
+      | boolean
+      | null;
+    deviceType: string;
+    backedUp: boolean;
+  };
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "redirects".
  */
 export interface Redirect {
@@ -964,6 +1026,14 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'adminAccounts';
         value: string | AdminAccount;
+      } | null)
+    | ({
+        relationTo: 'appUsers';
+        value: string | AppUser;
+      } | null)
+    | ({
+        relationTo: 'appUserAccounts';
+        value: string | AppUserAccount;
       } | null)
     | ({
         relationTo: 'redirects';
@@ -1328,6 +1398,48 @@ export interface AdminUsersSelect<T extends boolean = true> {
  * via the `definition` "adminAccounts_select".
  */
 export interface AdminAccountsSelect<T extends boolean = true> {
+  name?: T;
+  picture?: T;
+  user?: T;
+  issuerName?: T;
+  scope?: T;
+  sub?: T;
+  passkey?:
+    | T
+    | {
+        credentialId?: T;
+        publicKey?: T;
+        counter?: T;
+        transports?: T;
+        deviceType?: T;
+        backedUp?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "appUsers_select".
+ */
+export interface AppUsersSelect<T extends boolean = true> {
+  email?: T;
+  last_name?: T;
+  first_name?: T;
+  hashedPassword?: T;
+  hashSalt?: T;
+  hashIterations?: T;
+  verificationCode?: T;
+  verificationHash?: T;
+  verificationTokenExpire?: T;
+  verificationKind?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "appUserAccounts_select".
+ */
+export interface AppUserAccountsSelect<T extends boolean = true> {
   name?: T;
   picture?: T;
   user?: T;

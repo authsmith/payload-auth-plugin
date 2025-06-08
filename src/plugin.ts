@@ -22,9 +22,8 @@
  * @packageDocumentation
  */
 
-import { Config, Endpoint, PayloadRequest, Plugin } from "payload"
-import {
-  AccountInfo,
+import type { Config, Endpoint, Plugin } from "payload"
+import type {
   PasswordProviderConfig,
   OAuthProviderConfig,
   PasskeyProviderConfig,
@@ -47,7 +46,6 @@ import {
 } from "./core/endpoints.js"
 import { formatSlug } from "./core/utils/slug.js"
 import { preflightCollectionCheck } from "./core/preflights/collections.js"
-import { AuthSession } from "./core/session.js"
 
 /**
  * Adds authentication to the Payload app.
@@ -108,10 +106,20 @@ interface PluginOptions {
    *
    */
   allowOAuthAutoSignUp?: boolean | undefined
+
   /**
-   * Secret to use for JWT signing and decryption
+   * Path to redirect upon successful signin, signups and etc
+   *
+   * Example: /dashboard or /admin or /profile
    */
-  secret: string
+  successRedirectPath: string
+
+  /**
+   * Path to redirect upon failed signin, signups and etc.
+   *
+   * Example: /dashboard or /admin or /profile
+   */
+  errorRedirectPath: string
 }
 
 export const authPlugin =
@@ -132,8 +140,9 @@ export const authPlugin =
       accountsCollectionSlug,
       providers,
       allowOAuthAutoSignUp,
-      secret,
       useAdmin,
+      successRedirectPath,
+      errorRedirectPath,
     } = pluginOptions
 
     preflightCollectionCheck(
@@ -147,17 +156,6 @@ export const authPlugin =
     const passkeyProvider = getPasskeyProvider(providers)
     const passwordProvider = getPasswordProvider(providers)
 
-    const session = new AuthSession(
-      name,
-      {
-        usersCollection: usersCollectionSlug,
-        accountsCollection: accountsCollectionSlug,
-      },
-      allowOAuthAutoSignUp ?? false,
-      secret,
-      !!useAdmin,
-    )
-
     const endpointsFactory = new EndpointsFactory(
       name,
       {
@@ -165,8 +163,9 @@ export const authPlugin =
         accountsCollection: accountsCollectionSlug,
       },
       allowOAuthAutoSignUp ?? false,
-      secret,
       !!useAdmin,
+      successRedirectPath,
+      errorRedirectPath,
     )
 
     let oauthEndpoints: Endpoint[] = []
@@ -178,20 +177,7 @@ export const authPlugin =
         "oauth",
         new OAuthEndpointStrategy(oauthProviders),
       )
-      oauthEndpoints = endpointsFactory.createEndpoints("oauth", {
-        sessionCallback: (
-          oauthAccountInfo: AccountInfo,
-          scope: string,
-          issuerName: string,
-          request: PayloadRequest,
-        ) =>
-          session.oauthSessionCallback(
-            oauthAccountInfo,
-            scope,
-            issuerName,
-            request,
-          ),
-      })
+      oauthEndpoints = endpointsFactory.createEndpoints("oauth")
     }
 
     if (passkeyProvider) {
@@ -203,22 +189,24 @@ export const authPlugin =
     }
 
     if (passwordProvider) {
-      if (!!!config.email) {
+      if (!config.email) {
         throw new MissingEmailAdapter()
       }
       endpointsFactory.registerStrategy(
         "password",
-        new PasswordAuthEndpointStrategy({ usersCollectionSlug }, secret),
+        new PasswordAuthEndpointStrategy(
+          {
+            usersCollectionSlug,
+          },
+          passwordProvider,
+        ),
       )
-      passwordEndpoints = endpointsFactory.createEndpoints("password", {
-        sessionCallback: (user: { id: string; email: string }) =>
-          session.passwordSessionCallback(user),
-      })
+      passwordEndpoints = endpointsFactory.createEndpoints("password")
     }
 
     endpointsFactory.registerStrategy(
       "session",
-      new SessionEndpointStrategy(secret, { usersCollectionSlug }),
+      new SessionEndpointStrategy({ usersCollectionSlug }),
     )
     const sessionEndpoints = endpointsFactory.createEndpoints("session")
 

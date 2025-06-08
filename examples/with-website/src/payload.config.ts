@@ -2,9 +2,9 @@
 import { mongooseAdapter } from '@payloadcms/db-mongodb'
 
 import sharp from 'sharp' // sharp-import
-import path from 'path'
-import { buildConfig, PayloadRequest } from 'payload'
-import { fileURLToPath } from 'url'
+import path from 'node:path'
+import { buildConfig, type PayloadRequest } from 'payload'
+import { fileURLToPath } from 'node:url'
 
 import { Categories } from './collections/Categories'
 import { Media } from './collections/Media'
@@ -17,6 +17,9 @@ import { defaultLexical } from '@/fields/defaultLexical'
 import { getServerSideURL } from './utilities/getURL'
 import { AdminUsers } from './collections/Auth/Admin/Users'
 import { AdminAccounts } from './collections/Auth/Admin/Accounts'
+import { AppUsers } from './collections/Auth/App/Users'
+import { AppUsersAccounts } from './collections/Auth/App/Accounts'
+import { resendAdapter } from '@payloadcms/email-resend'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -24,10 +27,11 @@ const dirname = path.dirname(filename)
 export default buildConfig({
   serverURL: process.env.NEXT_PUBLIC_SERVER_URL,
   admin: {
-    routes: {
-      login: '/auth/signin',
-    },
+    // routes: {
+    //   login: '/auth/signin',
+    // },
     components: {
+      afterLogin: ['@/components/AfterLogin/index#AdminLogin'],
       views: {
         login: {
           Component: '@/views/AdminLogin/index#AdminLoginView',
@@ -67,7 +71,16 @@ export default buildConfig({
   db: mongooseAdapter({
     url: process.env.DATABASE_URI || '',
   }),
-  collections: [Pages, Posts, Media, Categories, AdminUsers, AdminAccounts],
+  collections: [
+    Pages,
+    Posts,
+    Media,
+    Categories,
+    AdminUsers,
+    AdminAccounts,
+    AppUsers,
+    AppUsersAccounts,
+  ],
   cors: [getServerSideURL()].filter(Boolean),
   globals: [Header, Footer],
   plugins: [
@@ -94,4 +107,9 @@ export default buildConfig({
     },
     tasks: [],
   },
+  email: resendAdapter({
+    defaultFromAddress: 'delivered@resend.dev',
+    defaultFromName: 'AuthSmith',
+    apiKey: process.env.RESEND_API_KEY || '',
+  }),
 })

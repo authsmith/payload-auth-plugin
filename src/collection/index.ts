@@ -1,4 +1,4 @@
-import { CollectionConfig, Field } from "payload"
+import type { CollectionConfig, Field } from "payload"
 import { MissingCollectionSlug } from "../core/errors/consoleErrors.js"
 
 /**
@@ -38,8 +38,29 @@ export const withUsersCollection = (
       name: "hashIterations",
       type: "number",
     },
+    {
+      name: "verificationCode",
+      label: "Verification Code",
+      type: "text",
+      unique: true,
+    },
+    {
+      name: "verificationHash",
+      label: "Verification Hash",
+      type: "text",
+    },
+    {
+      name: "verificationTokenExpire",
+      label: "Verification Token Expire",
+      type: "number",
+    },
+    {
+      name: "verificationKind",
+      label: "Verification Kind",
+      type: "text",
+    },
   ]
-  if (!collectionConfig.fields.some((field) => field.type === "email")) {
+  if (!incomingCollection.fields?.find((field) => field.type === "email")) {
     baseFields.push({
       name: "email",
       type: "email",
@@ -49,8 +70,8 @@ export const withUsersCollection = (
   }
 
   collectionConfig.fields = [
-    ...baseFields,
     ...(incomingCollection.fields ?? []),
+    ...baseFields,
   ]
   collectionConfig.access = {
     admin: ({ req: { user } }) => Boolean(user),

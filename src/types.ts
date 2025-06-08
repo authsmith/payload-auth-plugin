@@ -18,7 +18,7 @@ export enum SuccessKind {
 export interface AuthPluginOutput {
   message: string
   kind: ErrorKind | SuccessKind
-  data: any
+  data: unknown
   isSuccess: boolean
   isError: boolean
 }
@@ -110,6 +110,9 @@ export interface AccountInfo {
 export type PasswordProviderConfig = {
   id: string
   kind: "password"
+  emailTemplates: {
+    forgotPassword: any
+  }
   // name: string
   // verfiyEmail?: boolean
   // passwordless?: boolean

@@ -21,7 +21,7 @@ export async function createSessionCookies(
 
   const cookies: string[] = []
   cookies.push(
-    `${name}=${token};Path=/;HttpOnly;Secure=true;SameSite=lax;Expires=${tokenExpiration.toUTCString()}`,
+    `${name}=${token};Path=/;HttpOnly;Secure=false;SameSite=lax;Expires=${tokenExpiration.toUTCString()}`,
   )
   return cookies
 }

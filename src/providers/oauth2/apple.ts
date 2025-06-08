@@ -1,4 +1,4 @@
-import { AuthorizationServer } from "oauth4webapi"
+import type { AuthorizationServer } from "oauth4webapi"
 import type {
   AccountInfo,
   OAuth2ProviderConfig,

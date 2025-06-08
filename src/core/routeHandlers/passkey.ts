@@ -1,7 +1,7 @@
 import type { PayloadRequest } from "payload"
 import { InvalidAPIRequest } from "../errors/apiErrors.js"
 import { InitPasskey } from "../protocols/passkey/index.js"
-import { AccountInfo } from "../../types.js"
+import type { AccountInfo } from "../../types.js"
 import {
   GeneratePasskeyRegistration,
   VerifyPasskeyRegistration,

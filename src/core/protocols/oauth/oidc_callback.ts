@@ -4,6 +4,7 @@ import type { AccountInfo, OIDCProviderConfig } from "../../../types.js"
 import { getCallbackURL } from "../../utils/cb.js"
 import { MissingOrInvalidSession } from "../../errors/consoleErrors.js"
 import {
+  InternalServerError,
   MissingEmailAPIError,
   UnVerifiedAccountAPIError,
 } from "../../errors/apiErrors.js"
@@ -58,7 +59,7 @@ export async function OIDCCallback(
     code_verifier,
   )
 
-  let body = (await grantResponse.json()) as { scope: string | string[] }
+  const body = (await grantResponse.json()) as { scope: string | string[] }
   let response = new Response(JSON.stringify(body), grantResponse)
   if (Array.isArray(body.scope)) {
     body.scope = body.scope.join(" ")
@@ -75,7 +76,11 @@ export async function OIDCCallback(
     },
   )
 
-  const claims = oauth.getValidatedIdTokenClaims(token_result)!
+  const claims = oauth.getValidatedIdTokenClaims(token_result)
+  if (!claims?.sub) {
+    return new InternalServerError()
+  }
+
   const userInfoResponse = await oauth.userInfoRequest(
     as,
     client,
@@ -85,7 +90,7 @@ export async function OIDCCallback(
   const result = await oauth.processUserInfoResponse(
     as,
     client,
-    claims.sub,
+    claims?.sub,
     userInfoResponse,
   )
 
@@ -102,11 +107,17 @@ export async function OIDCCallback(
   )
 
   authenticationURL.searchParams.set("sub", result.sub)
-  authenticationURL.searchParams.set("email", result.email)
+  authenticationURL.searchParams.set("email", encodeURIComponent(result.email))
   authenticationURL.searchParams.set("name", result.name ?? "")
   authenticationURL.searchParams.set("scope", providerConfig.scope)
-  authenticationURL.searchParams.set("issuer", providerConfig.issuer)
-  authenticationURL.searchParams.set("picture", result.picture ?? "")
+  authenticationURL.searchParams.set(
+    "issuer",
+    encodeURIComponent(providerConfig.issuer),
+  )
+  authenticationURL.searchParams.set(
+    "picture",
+    encodeURIComponent(result.picture ?? ""),
+  )
 
   const res = new Response(null, {
     status: 302,

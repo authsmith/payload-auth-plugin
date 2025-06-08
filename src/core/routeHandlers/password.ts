@@ -8,6 +8,7 @@ import {
 } from "../protocols/password.js"
 import { InvalidAPIRequest } from "../errors/apiErrors.js"
 import { APP_COOKIE_SUFFIX } from "../../constants.js"
+import type { PasswordProviderConfig } from "../../types.js"
 
 export function PasswordAuthHandlers(
   request: PayloadRequest,
@@ -16,19 +17,42 @@ export function PasswordAuthHandlers(
   internal: {
     usersCollectionSlug: string
   },
-  sessionCallBack: (user: { id: string; email: string }) => Promise<Response>,
   secret: string,
+  useAdmin: boolean,
+  successRedirectPath: string,
+  errorRedirectPath: string,
+  providerConfig: PasswordProviderConfig,
   stage?: string | undefined,
 ): Promise<Response> {
   switch (kind) {
     case "signin":
-      return PasswordSignin(request, internal, sessionCallBack)
+      return PasswordSignin(
+        pluginType,
+        request,
+        internal,
+        useAdmin,
+        secret,
+        successRedirectPath,
+        errorRedirectPath,
+      )
     case "signup":
-      return PasswordSignup(request, internal, sessionCallBack)
+      return PasswordSignup(
+        pluginType,
+        request,
+        internal,
+        useAdmin,
+        secret,
+        successRedirectPath,
+        errorRedirectPath,
+      )
     case "forgot-password":
       switch (stage) {
         case "init":
-          return ForgotPasswordInit(request, internal)
+          return ForgotPasswordInit(
+            request,
+            internal,
+            providerConfig.emailTemplates.forgotPassword,
+          )
         case "verify":
           return ForgotPasswordVerify(request, internal)
         default:

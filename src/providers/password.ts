@@ -1,9 +1,21 @@
-import { PasswordProviderConfig } from "../types.js"
+import type { PasswordProviderConfig } from "../types.js"
 
-function PasswordProvider(): PasswordProviderConfig {
+type PasswordProviderOptions = {
+  /**
+   * Email templates
+   */
+  emailTemplates: {
+    forgotPassword: any
+  }
+}
+
+function PasswordProvider(
+  options: PasswordProviderOptions,
+): PasswordProviderConfig {
   return {
     id: "password",
     kind: "password",
+    ...options,
   }
 }
 export default PasswordProvider
