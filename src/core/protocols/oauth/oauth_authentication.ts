@@ -107,7 +107,7 @@ export async function OAuthAuthentication(
   ]
   cookies = invalidateOAuthCookies(cookies)
   const successRedirectionURL = new URL(
-    `${request.origin}${successRedirectPath}`,
+    `${payload.config.serverURL}${successRedirectPath}`,
   )
   const res = new Response(null, {
     status: 302,
