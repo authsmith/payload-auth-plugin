@@ -109,7 +109,7 @@ export async function OIDCCallback(
   }
 
   if (!result.email) {
-    return new MissingEmailAPIError()
+    return new UnVerifiedAccountAPIError()
   }
 
   const userData = {
