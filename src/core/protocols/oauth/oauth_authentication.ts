@@ -1,14 +1,11 @@
-import type { JsonObject, TypeWithID, PayloadRequest } from "payload"
-import {
-  InvalidRequestBodyError,
-  UserNotFoundAPIError,
-} from "../../errors/apiErrors.js"
 import * as jose from "jose"
+import type { JsonObject, PayloadRequest, TypeWithID } from "payload"
+import { APP_COOKIE_SUFFIX } from "../../../constants.js"
+import { UserNotFoundAPIError } from "../../errors/apiErrors.js"
 import {
   createSessionCookies,
   invalidateOAuthCookies,
 } from "../../utils/cookies.js"
-import { APP_COOKIE_SUFFIX } from "../../../constants.js"
 
 export async function OAuthAuthentication(
   pluginType: string,
@@ -29,9 +26,18 @@ export async function OAuthAuthentication(
     scope: string
     issuer: string
     picture?: string | undefined
+    access_token: string
   },
 ): Promise<Response> {
-  const { email: _email, sub, name, scope, issuer, picture } = account
+  const {
+    email: _email,
+    sub,
+    name,
+    scope,
+    issuer,
+    picture,
+    access_token,
+  } = account
   const { payload } = request
 
   const email = _email.toLowerCase()
@@ -49,7 +55,7 @@ export async function OAuthAuthentication(
     userRecord = userRecords.docs[0]
   } else if (allowOAuthAutoSignUp) {
     const data: Record<string, unknown> = {
-      email: email,
+      email,
     }
     const hasAuthEnabled = Boolean(
       payload.collections[collections.usersCollection].config.auth,
@@ -73,6 +79,7 @@ export async function OAuthAuthentication(
     name: name,
     picture: picture,
     issuerName: issuer,
+    access_token,
   }
 
   const accountRecords = await payload.find({

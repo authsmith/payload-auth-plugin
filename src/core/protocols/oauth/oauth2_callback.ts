@@ -1,8 +1,8 @@
-import { parseCookies, type PayloadRequest } from "payload"
 import * as oauth from "oauth4webapi"
+import { parseCookies, type PayloadRequest } from "payload"
 import type { OAuth2ProviderConfig } from "../../../types.js"
-import { getCallbackURL } from "../../utils/cb.js"
 import { MissingOrInvalidSession } from "../../errors/consoleErrors.js"
+import { getCallbackURL } from "../../utils/cb.js"
 import { OAuthAuthentication } from "./oauth_authentication.js"
 
 export async function OAuth2Callback(
@@ -85,6 +85,7 @@ export async function OAuth2Callback(
     scope: providerConfig.scope,
     issuer: providerConfig.authorization_server.issuer,
     picture: userInfo.picture ?? "",
+    access_token: token_result.access_token,
   }
 
   return await OAuthAuthentication(

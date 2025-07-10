@@ -110,6 +110,7 @@ export interface AccountInfo {
     deviceType: string
     backedUp: boolean
   }
+  access_token?: string
 }
 
 export type PasswordProviderConfig = {

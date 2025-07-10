@@ -1,13 +1,13 @@
-import { parseCookies, type PayloadRequest } from "payload"
 import * as oauth from "oauth4webapi"
-import type { AccountInfo, OIDCProviderConfig } from "../../../types.js"
-import { getCallbackURL } from "../../utils/cb.js"
-import { MissingOrInvalidSession } from "../../errors/consoleErrors.js"
+import { parseCookies, type PayloadRequest } from "payload"
+import type { OIDCProviderConfig } from "../../../types.js"
 import {
   InternalServerError,
   MissingEmailAPIError,
   UnVerifiedAccountAPIError,
 } from "../../errors/apiErrors.js"
+import { MissingOrInvalidSession } from "../../errors/consoleErrors.js"
+import { getCallbackURL } from "../../utils/cb.js"
 import { OAuthAuthentication } from "./oauth_authentication.js"
 
 export async function OIDCCallback(
@@ -119,6 +119,7 @@ export async function OIDCCallback(
     scope: providerConfig.scope,
     issuer: providerConfig.issuer,
     picture: result.picture ?? "",
+    access_token: token_result.access_token,
   }
 
   return await OAuthAuthentication(

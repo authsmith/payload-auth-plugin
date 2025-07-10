@@ -145,6 +145,10 @@ export const withAccountCollection = (
       required: true,
     },
     {
+      name: "access_token",
+      type: "text",
+    },
+    {
       name: "passkey",
       type: "group",
       fields: [
