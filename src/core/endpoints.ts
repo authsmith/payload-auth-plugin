@@ -59,17 +59,20 @@ export class OAuthEndpointStrategy implements EndpointStrategy {
             request.routeParams?.provider as string
           ] as OAuthProviderConfig
 
-          return OAuthHandlers(
+          const state = request.searchParams.get("state") ?? undefined
+
+          return OAuthHandlers({
             pluginType,
             collections,
             allowOAuthAutoSignUp,
-            request.payload.secret,
+            secret: request.payload.secret,
             useAdmin,
             request,
             provider,
             successRedirectPath,
             errorRedirectPath,
-          )
+            state,
+          })
         },
       },
     ]

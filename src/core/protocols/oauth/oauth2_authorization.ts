@@ -1,6 +1,7 @@
+import { createOAuthState } from "@/core/routeHandlers/oauth"
+import { getCallbackURL } from "@/core/utils/cb"
+import { OAuth2ProviderConfig, ParsedOAuthState } from "@/types"
 import * as oauth from "oauth4webapi"
-import type { OAuth2ProviderConfig } from "../../../types.js"
-import { getCallbackURL } from "../../utils/cb.js"
 import type { PayloadRequest } from "payload"
 
 export async function OAuth2Authorization(
@@ -8,13 +9,16 @@ export async function OAuth2Authorization(
   request: PayloadRequest,
   providerConfig: OAuth2ProviderConfig,
   clientOrigin?: string | undefined,
+  parsedState?: ParsedOAuthState | null,
 ): Promise<Response> {
   const callback_url = getCallbackURL(
     request.payload.config.serverURL,
     pluginType,
     providerConfig.id,
   )
-  const code_verifier = oauth.generateRandomCodeVerifier()
+  const code_verifier =
+    parsedState?.codeVerifier || oauth.generateRandomCodeVerifier()
+
   const code_challenge = await oauth.calculatePKCECodeChallenge(code_verifier)
   const code_challenge_method = "S256"
   const { authorization_server, client_id, scope, params } = providerConfig
@@ -38,6 +42,10 @@ export async function OAuth2Authorization(
     "code_challenge_method",
     code_challenge_method,
   )
+
+  if (parsedState) {
+    authorizationURL.searchParams.set("state", createOAuthState(parsedState))
+  }
 
   if (params) {
     Object.entries(params).map(([key, value]) => {

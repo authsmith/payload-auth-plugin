@@ -65,12 +65,10 @@
     "dist"
   ],
   "scripts": {
-    "build": "bun run ./script/build.ts",
+    "build:bun": "bun run ./script/build.ts",
+    "build": "tsc && tsc-alias",
     "format": "bun x prettier --write '**/*.{js,jsx,ts,tsx,json,md,yaml,yml}'",
     "release": "bun run build && changeset publish"
-  },
-  "peerDependencies": {
-    "payload": "latest"
   },
   "devDependencies": {
     "@changesets/cli": "2.27.10",
@@ -82,6 +80,7 @@
     "git-cliff": "2.7.0",
     "globals": "^15.14.0",
     "prettier": "3.4.2",
+    "tsc-alias": "^1.8.16",
     "typescript": "^5.7.3"
   },
   "dependencies": {

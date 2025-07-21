@@ -1,4 +1,5 @@
 import type { AuthorizationServer } from "oauth4webapi"
+import { PayloadRequest } from "payload"
 
 export enum ErrorKind {
   NotFound = "NotFound",
@@ -148,4 +149,40 @@ export type UserSession = {
   createdAt: Date | string
   expiresAt: Date | string
   id: string
+}
+export interface OAuthCollections {
+  usersCollection: string
+  accountsCollection: string
+}
+
+export interface OAuthBaseParams {
+  pluginType: string
+  collections: OAuthCollections
+  allowOAuthAutoSignUp: boolean
+  secret: string
+  useAdmin: boolean
+  request: PayloadRequest
+  provider: OAuthProviderConfig
+  successRedirectPath: string
+  errorRedirectPath: string
+}
+export interface OAuthHandlersParams extends OAuthBaseParams {
+  state?: string
+}
+
+export interface OAuthCallbackParams extends OAuthBaseParams {}
+
+export interface OAuthAccountData extends Omit<AccountInfo, "passKey"> {
+  scope: string
+  issuer: string
+  access_token: string
+}
+
+export interface ParsedOAuthState {
+  redirectPath?: string
+  provider?: string
+  timestamp?: number
+  nonce?: string
+  codeVerifier?: string
+  [key: string]: unknown
 }

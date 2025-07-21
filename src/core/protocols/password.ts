@@ -88,6 +88,9 @@ export const PasswordSignin = async (
     return new UserNotFoundAPIError()
   }
   const userRecord = docs[0]
+  if (!userRecord) {
+    return new UserNotFoundAPIError()
+  }
   if (!userRecord.hashedPassword) {
     return new InvalidCredentials()
   }
@@ -116,6 +119,7 @@ export const PasswordSignin = async (
     const tokenExpInMs = collectionConfig.auth.tokenExpiration * 1000
     const expiresAt = new Date(now.getTime() + tokenExpInMs)
     const session = { id: sessionID, createdAt: now, expiresAt }
+
     if (!userRecord["sessions"]?.length) {
       userRecord["sessions"] = [session]
     } else {
@@ -316,7 +320,9 @@ export const ForgotPasswordInit = async (
   )
   const verification_token_expires = new Date()
   verification_token_expires.setDate(verification_token_expires.getDate() + 7)
-
+  if (!docs[0]) {
+    return new MissingOrInvalidVerification()
+  }
   await payload.update({
     collection: internal.usersCollectionSlug,
     id: docs[0].id,
@@ -356,6 +362,9 @@ export const ForgotPasswordVerify = async (
       verificationCode: { equals: body.code },
     },
   })
+  if (docs.length === 0 || !docs[0]) {
+    return new MissingOrInvalidVerification()
+  }
 
   const currentDate = Date.now()
   if (
@@ -456,11 +465,14 @@ export const ResetPassword = async (
   }
 
   const user = docs[0]
+  if (!user) {
+    return new UserNotFoundAPIError()
+  }
   const isVerifed = await verifyPassword(
     body.currentPassword,
-    user.hashedPassword,
-    user.hashSalt,
-    user.hashIterations,
+    user?.hashedPassword,
+    user?.hashSalt,
+    user?.hashIterations,
   )
   if (!isVerifed) {
     return new InvalidCredentials()

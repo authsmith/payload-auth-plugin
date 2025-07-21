@@ -1,35 +1,53 @@
 import * as oauth from "oauth4webapi"
-import { parseCookies, type PayloadRequest } from "payload"
-import type { OAuth2ProviderConfig } from "../../../types.js"
-import { MissingOrInvalidSession } from "../../errors/consoleErrors.js"
-import { getCallbackURL } from "../../utils/cb.js"
-import { OAuthAuthentication } from "./oauth_authentication.js"
+import { parseCookies } from "payload"
+import { OAuthAuthentication } from "./oauth_authentication"
+import { MissingOrInvalidSession } from "@/core/errors/consoleErrors"
+import { createOAuthState } from "@/core/routeHandlers/oauth"
+import { getCallbackURL } from "@/core/utils/cb"
+import {
+  OAuthCallbackParams,
+  ParsedOAuthState,
+  OAuth2ProviderConfig,
+  AccountInfo,
+  OAuthAccountData,
+} from "@/types"
 
 export async function OAuth2Callback(
-  pluginType: string,
-  request: PayloadRequest,
-  providerConfig: OAuth2ProviderConfig,
-  collections: {
-    usersCollection: string
-    accountsCollection: string
-  },
-  allowOAuthAutoSignUp: boolean,
-  useAdmin: boolean,
-  secret: string,
-  successRedirectPath: string,
-  errorRedirectPath: string,
+  params: OAuthCallbackParams,
+  parsedState: ParsedOAuthState | null,
 ): Promise<Response> {
+  const {
+    pluginType,
+    request,
+    provider,
+    collections,
+    allowOAuthAutoSignUp,
+    useAdmin,
+    secret,
+    successRedirectPath,
+    errorRedirectPath,
+  } = params
+
+  const providerConfig = provider as OAuth2ProviderConfig
   const parsedCookies = parseCookies(request.headers)
 
-  const code_verifier = parsedCookies.get("__session-code-verifier")
-  const state = parsedCookies.get("__session-oauth-state")
+  const code_verifier =
+    parsedState?.codeVerifier || parsedCookies.get("__session-code-verifier")
+  const state = parsedState
+    ? createOAuthState(parsedState)
+    : parsedCookies.get("__session-oauth-state")
 
   if (!code_verifier) {
     throw new MissingOrInvalidSession()
   }
 
-  const { client_id, client_secret, authorization_server, client_auth_type } =
-    providerConfig
+  const {
+    client_id,
+    client_secret,
+    authorization_server,
+    client_auth_type,
+    profile,
+  } = providerConfig
 
   const client: oauth.Client = {
     client_id,
@@ -48,18 +66,25 @@ export async function OAuth2Callback(
   )
   const as = authorization_server
 
-  const params = oauth.validateAuthResponse(as, client, current_url, state)
+  const params_oauth = oauth.validateAuthResponse(
+    as,
+    client,
+    current_url,
+    state,
+  )
 
   const grantResponse = await oauth.authorizationCodeGrantRequest(
     as,
     client,
     clientAuth,
-    params,
+    params_oauth,
     callback_url.toString(),
     code_verifier,
   )
+
   const body = (await grantResponse.json()) as { scope: string | string[] }
   let response = new Response(JSON.stringify(body), grantResponse)
+
   if (Array.isArray(body.scope)) {
     body.scope = body.scope.join(" ")
     response = new Response(JSON.stringify(body), grantResponse)
@@ -78,13 +103,23 @@ export async function OAuth2Callback(
   )
   const userInfo = (await userInfoResponse.json()) as Record<string, string>
 
-  const userData = {
-    email: userInfo.email,
-    name: userInfo.name ?? "",
-    sub: userInfo.sub,
+  // Use the provider's profile callback if available
+  let accountInfo: AccountInfo
+  if (profile) {
+    accountInfo = profile(userInfo)
+  } else {
+    accountInfo = {
+      sub: userInfo.sub ?? "",
+      name: userInfo.name ?? "",
+      email: userInfo.email ?? "",
+      picture: userInfo.picture ?? "",
+    }
+  }
+
+  const userData: OAuthAccountData = {
+    ...accountInfo,
     scope: providerConfig.scope,
     issuer: providerConfig.authorization_server.issuer,
-    picture: userInfo.picture ?? "",
     access_token: token_result.access_token,
   }
 

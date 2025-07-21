@@ -1,72 +1,107 @@
 import type { PayloadRequest } from "payload"
-import type { OAuthProviderConfig } from "../../types.js"
+import type {
+  OAuthHandlersParams,
+  OAuthCallbackParams,
+  ParsedOAuthState,
+} from "@/types"
 import {
   InvalidOAuthAlgorithm,
   InvalidOAuthResource,
   InvalidProvider,
-} from "../errors/consoleErrors.js"
-import { OIDCAuthorization } from "../protocols/oauth/oidc_authorization.js"
-import { OAuth2Authorization } from "../protocols/oauth/oauth2_authorization.js"
-import { OIDCCallback } from "../protocols/oauth/oidc_callback.js"
-import { OAuth2Callback } from "../protocols/oauth/oauth2_callback.js"
+} from "@/errors/consoleErrors"
+import { OIDCAuthorization } from "@/protocols/oauth/oidc_authorization"
+import { OAuth2Authorization } from "@/protocols/oauth/oauth2_authorization"
+import { OIDCCallback } from "@/protocols/oauth/oidc_callback"
+import { OAuth2Callback } from "@/protocols/oauth/oauth2_callback"
 
-export function OAuthHandlers(
-  pluginType: string,
-  collections: {
-    usersCollection: string
-    accountsCollection: string
-  },
-  allowOAuthAutoSignUp: boolean,
-  secret: string,
-  useAdmin: boolean,
-  request: PayloadRequest,
-  provider: OAuthProviderConfig,
-  successRedirectPath: string,
-  errorRedirectPath: string,
+/**
+ * Safely parse OAuth state parameter
+ */
+function parseOAuthState(state: string | undefined): ParsedOAuthState | null {
+  if (!state) return null
+
+  try {
+    return JSON.parse(decodeURIComponent(state)) as ParsedOAuthState
+  } catch (error) {
+    console.warn("Failed to parse OAuth state:", error)
+    return null
+  }
+}
+
+/**
+ * Create OAuth state parameter
+ */
+export function createOAuthState(data: ParsedOAuthState): string {
+  return encodeURIComponent(
+    JSON.stringify({
+      ...data,
+      timestamp: Date.now(),
+    }),
+  )
+}
+
+/**
+ * Main OAuth handler that routes to appropriate authorization or callback handlers
+ */
+export async function OAuthHandlers(
+  params: OAuthHandlersParams,
 ): Promise<Response> {
+  const {
+    pluginType,
+    collections,
+    allowOAuthAutoSignUp,
+    secret,
+    useAdmin,
+    request,
+    provider,
+    successRedirectPath,
+    errorRedirectPath,
+    state,
+  } = params
+
   if (!provider) {
     throw new InvalidProvider()
   }
 
   const resource = request.routeParams?.resource as string
+  const parsedState = parseOAuthState(state)
+
+  // Create callback params with parsed state
+  const callbackParams: OAuthCallbackParams = {
+    pluginType,
+    collections,
+    allowOAuthAutoSignUp,
+    secret,
+    useAdmin,
+    request,
+    provider,
+    successRedirectPath: parsedState?.redirectPath || successRedirectPath,
+    errorRedirectPath,
+  }
 
   switch (resource) {
     case "authorization":
       switch (provider.algorithm) {
         case "oidc":
-          return OIDCAuthorization(pluginType, request, provider)
+          return OIDCAuthorization(pluginType, request, provider, parsedState)
         case "oauth2":
-          return OAuth2Authorization(pluginType, request, provider)
+          return OAuth2Authorization(
+            pluginType,
+            request,
+            provider,
+            undefined,
+            parsedState,
+          )
         default:
           throw new InvalidOAuthAlgorithm()
       }
     case "callback":
       switch (provider.algorithm) {
         case "oidc": {
-          return OIDCCallback(
-            pluginType,
-            request,
-            provider,
-            collections,
-            allowOAuthAutoSignUp,
-            useAdmin,
-            secret,
-            successRedirectPath,
-            errorRedirectPath,
-          )
+          return OIDCCallback(callbackParams, parsedState)
         }
         case "oauth2": {
-          return OAuth2Callback(
-            pluginType,
-            request,
-            provider,
-            collections,
-            allowOAuthAutoSignUp,
-            useAdmin,
-            secret,
-            successRedirectPath,
-            errorRedirectPath,
-          )
+          return OAuth2Callback(callbackParams, parsedState)
         }
         default:
           throw new InvalidOAuthAlgorithm()
