@@ -19,6 +19,7 @@ import { authPlugin } from 'payload-auth-plugin'
 import {
   Auth0AuthProvider,
   GoogleAuthProvider,
+  MicrosoftEntraAuthProvider,
   PasswordProvider,
   TwitchAuthProvider,
 } from 'payload-auth-plugin/providers'
@@ -145,6 +146,13 @@ export const plugins: Plugin[] = [
         client_id: process.env.AUTH0_CLIENT_ID as string,
         client_secret: process.env.AUTH0_CLIENT_SECRET as string,
       }),
+	  MicrosoftEntraAuthProvider({
+		tenant_id: process.env.MSFT_ENTRA_TENANT_ID as string,
+		client_id: process.env.MSFT_AUTH_CLIENT_ID as string,
+		client_secret: process.env.MSFT_AUTH_CLIENT_SECRET as string,
+
+		skip_email_verification: true,
+	  })
     ],
   }),
 ]
