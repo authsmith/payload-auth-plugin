@@ -19,7 +19,7 @@
     "outDir": "${configDir}/dist",
     "resolveJsonModule": true,
     "skipLibCheck": true,
-    "emitDeclarationOnly": true,
+    "emitDeclarationOnly": false,
     "sourceMap": true,
     "baseUrl": ".",
     "lib": [

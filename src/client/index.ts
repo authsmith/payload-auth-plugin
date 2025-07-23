@@ -32,10 +32,12 @@ class AuthClient {
       (process.env.NEXT_PUBLIC_PAYLOAD_AUTH_URL as string)
   }
 
-  signin() {
+  signin(redirectUrl?: string) {
+    console.error("the redirectUrl is: " + redirectUrl)
     return signin({
       name: this.name,
       baseURL: this.baseURL,
+      redirectUrl,
     })
   }
   register() {

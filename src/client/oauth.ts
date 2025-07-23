@@ -3,6 +3,7 @@
 type BaseOptions = {
   name: string
   baseURL: string
+  redirectUrl?: string
 }
 
 export type OauthProvider =
@@ -22,6 +23,6 @@ export type OauthProvider =
   | "okta"
 
 export const oauth = (options: BaseOptions, provider: OauthProvider): void => {
-  const oauthURL = `${options.baseURL}/api/${options.name}/oauth/authorization/${provider}`
+  const oauthURL = `${options.baseURL}/api/${options.name}/oauth/authorization/${provider}${options.redirectUrl ? `?state=${encodeURIComponent(JSON.stringify({ redirectUrl: options.redirectUrl }))}` : ""}`
   window.location.href = oauthURL
 }

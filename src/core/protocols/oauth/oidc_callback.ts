@@ -69,13 +69,14 @@ export async function OIDCCallback(
   const stateParam = parsedState
     ? createOAuthState(parsedState)
     : providerConfig?.params?.state || undefined
-
+  console.error("OIDC Callback state parameter:", stateParam)
   const params_oauth = oauth.validateAuthResponse(
     as,
     client,
     current_url,
     stateParam,
   )
+  console.error("OIDC Callback params_oauth:", params_oauth)
 
   const grantResponse = await oauth.authorizationCodeGrantRequest(
     as,
