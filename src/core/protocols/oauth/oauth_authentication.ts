@@ -32,6 +32,7 @@ export async function OAuthAuthentication(
     issuer: string
     picture?: string | undefined
     access_token: string
+    claims: Record<string, unknown>
   },
 ): Promise<Response> {
   const {
@@ -42,6 +43,7 @@ export async function OAuthAuthentication(
     issuer,
     picture,
     access_token,
+    claims,
   } = account
   const { payload } = request
 
@@ -125,12 +127,14 @@ export async function OAuthAuthentication(
     const tokenExpInMs = collectionConfig.auth.tokenExpiration * 1000
     const expiresAt = new Date(now.getTime() + tokenExpInMs)
     const session = { id: sessionID, createdAt: now, expiresAt }
-    if (!userRecord["sessions"]?.length) {
-      userRecord["sessions"] = [session]
+
+    if (!userRecord?.sessions?.length) {
+      userRecord.sessions = [session]
     } else {
       userRecord.sessions = removeExpiredSessions(userRecord.sessions)
       userRecord.sessions.push(session)
     }
+    userRecord.claims = claims
     await payload.db.updateOne({
       id: userRecord.id,
       collection: collections.usersCollection,
