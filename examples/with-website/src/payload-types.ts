@@ -381,6 +381,22 @@ export interface User {
   id: number;
   firstName?: string | null;
   lastName?: string | null;
+  hashedPassword?: string | null;
+  hashSalt?: string | null;
+  hashIterations?: number | null;
+  verificationCode?: string | null;
+  verificationHash?: string | null;
+  verificationTokenExpire?: number | null;
+  verificationKind?: string | null;
+  claims?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
   updatedAt: string;
   createdAt: string;
   email: string;
@@ -797,6 +813,15 @@ export interface AppUser {
   verificationHash?: string | null;
   verificationTokenExpire?: number | null;
   verificationKind?: string | null;
+  claims?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -1392,6 +1417,14 @@ export interface CategoriesSelect<T extends boolean = true> {
 export interface UsersSelect<T extends boolean = true> {
   firstName?: T;
   lastName?: T;
+  hashedPassword?: T;
+  hashSalt?: T;
+  hashIterations?: T;
+  verificationCode?: T;
+  verificationHash?: T;
+  verificationTokenExpire?: T;
+  verificationKind?: T;
+  claims?: T;
   updatedAt?: T;
   createdAt?: T;
   email?: T;
@@ -1449,6 +1482,7 @@ export interface AppUsersSelect<T extends boolean = true> {
   verificationHash?: T;
   verificationTokenExpire?: T;
   verificationKind?: T;
+  claims?: T;
   updatedAt?: T;
   createdAt?: T;
 }
