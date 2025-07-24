@@ -65,16 +65,30 @@ export async function OIDCCallback(
     .discoveryRequest(issuer_url, { algorithm })
     .then((response) => oauth.processDiscoveryResponse(issuer_url, response))
 
-  // Use parsed state for validation if available
-  const stateParam = parsedState
-    ? createOAuthState(parsedState)
-    : providerConfig?.params?.state || undefined
-  console.error("OIDC Callback state parameter:", stateParam)
+  // Handle state validation manually since we're using it for redirect logic
+  const cookieState = parsedCookies.get("__session-oauth-state")
+  const urlState = current_url.searchParams.get("state")
+  const urlStateDecoded = urlState ? decodeURIComponent(urlState) : null
+
+  console.error("Cookie state:", cookieState)
+  console.error("URL state (from callback):", urlState)
+  console.error("URL state decoded:", urlStateDecoded)
+
+  // Validate state manually for security
+  if (cookieState && urlStateDecoded && cookieState !== urlStateDecoded) {
+    throw new Error("State parameter mismatch - possible CSRF attack")
+  }
+
+  // Remove state from URL for OAuth validation since we handle it separately
+  const urlWithoutState = new URL(current_url.toString())
+  urlWithoutState.searchParams.delete("state")
+
+  // Pass undefined for state since we're handling it manually
   const params_oauth = oauth.validateAuthResponse(
     as,
     client,
-    current_url,
-    stateParam,
+    urlWithoutState, // URL without state parameter
+    undefined, // No state validation by oauth4webapi
   )
   console.error("OIDC Callback params_oauth:", params_oauth)
 

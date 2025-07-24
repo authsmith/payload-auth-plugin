@@ -44,14 +44,31 @@ export async function OIDCAuthorization(
     code_challenge_method,
   )
 
-  // Add state parameter if provided
+  // Create and store state parameter
+  let stateValue: string | undefined
   if (parsedState) {
-    authorizationURL.searchParams.set("state", createOAuthState(parsedState))
+    stateValue = createOAuthState(parsedState)
+    authorizationURL.searchParams.set("state", stateValue)
+
+    // Store the state in a cookie for callback validation
+    cookies.push(
+      `__session-oauth-state=${stateValue};Path=/;HttpOnly;SameSite=lax;Expires=${cookieMaxage.toUTCString()}`,
+    )
   }
 
   if (params) {
     Object.entries(params).map(([key, value]) => {
-      authorizationURL.searchParams.set(key, value)
+      // Don't override the state if we already set it
+      if (key !== "state" || !stateValue) {
+        authorizationURL.searchParams.set(key, value)
+
+        // If state comes from params and we haven't set it yet, store it in cookie
+        if (key === "state" && !stateValue) {
+          cookies.push(
+            `__session-oauth-state=${value};Path=/;HttpOnly;SameSite=lax;Expires=${cookieMaxage.toUTCString()}`,
+          )
+        }
+      }
     })
   }
 
