@@ -1,0 +1,1 @@
+{"version":3,"file":"session.d.ts","sourceRoot":"","sources":["../../../src/core/routeHandlers/session.ts"],"names":[],"mappings":"AAAA,OAAO,KAAK,EAAE,cAAc,EAAE,MAAM,SAAS,CAAA;AAS7C,wBAAgB,eAAe,CAC7B,OAAO,EAAE,cAAc,EACvB,UAAU,EAAE,MAAM,EAClB,SAAS,EAAE;IACT,mBAAmB,EAAE,MAAM,CAAA;CAC5B,qBAwBF"}

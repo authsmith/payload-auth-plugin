@@ -1,0 +1,1 @@
+{"version":3,"file":"github.d.ts","sourceRoot":"","sources":["../../../src/providers/oauth2/github.ts"],"names":[],"mappings":"AACA,OAAO,KAAK,EACV,oBAAoB,EAEpB,uBAAuB,EACxB,MAAM,gBAAgB,CAAA;AASvB,KAAK,gBAAgB,GAAG,uBAAuB,CAAA;AAE/C;;;;;;;;;;;;;;;;;;;;;;;;;;;;GA4BG;AAEH,iBAAS,kBAAkB,CAAC,MAAM,EAAE,gBAAgB,GAAG,oBAAoB,CAoB1E;AAED,eAAe,kBAAkB,CAAA"}

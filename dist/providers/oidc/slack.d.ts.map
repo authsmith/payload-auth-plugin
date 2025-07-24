@@ -1,0 +1,1 @@
+{"version":3,"file":"slack.d.ts","sourceRoot":"","sources":["../../../src/providers/oidc/slack.ts"],"names":[],"mappings":"AAAA,OAAO,KAAK,EAEV,kBAAkB,EAClB,uBAAuB,EACxB,MAAM,gBAAgB,CAAA;AAEvB,KAAK,eAAe,GAAG,uBAAuB,CAAA;AAE9C;;;;;;;;;;;;;;;;;;;;;;;;;;;;GA4BG;AAEH,iBAAS,iBAAiB,CAAC,MAAM,EAAE,eAAe,GAAG,kBAAkB,CAoBtE;AAED,eAAe,iBAAiB,CAAA"}

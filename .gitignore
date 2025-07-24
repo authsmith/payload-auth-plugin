@@ -244,7 +244,7 @@ dev/generated-types.ts
 dev/generated-schema.graphql
 
 # Ignore dist, no need for git
-dist
+# dist
 .trunl
 
 dev/src/uploads

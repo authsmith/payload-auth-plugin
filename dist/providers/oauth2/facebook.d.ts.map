@@ -1,0 +1,1 @@
+{"version":3,"file":"facebook.d.ts","sourceRoot":"","sources":["../../../src/providers/oauth2/facebook.ts"],"names":[],"mappings":"AACA,OAAO,KAAK,EACV,oBAAoB,EAEpB,uBAAuB,EACxB,MAAM,gBAAgB,CAAA;AAUvB,KAAK,kBAAkB,GAAG,uBAAuB,CAAA;AAEjD;;;;;;;;;;;;;;;;;;;;;;;;;;;GA2BG;AAEH,iBAAS,oBAAoB,CAC3B,MAAM,EAAE,kBAAkB,GACzB,oBAAoB,CA6BtB;AAED,eAAe,oBAAoB,CAAA"}

@@ -1,0 +1,1 @@
+{"version":3,"file":"discord.d.ts","sourceRoot":"","sources":["../../../src/providers/oauth2/discord.ts"],"names":[],"mappings":"AACA,OAAO,KAAK,EACV,oBAAoB,EAEpB,uBAAuB,EACxB,MAAM,gBAAgB,CAAA;AAQvB,KAAK,iBAAiB,GAAG,uBAAuB,CAAA;AAEhD;;;;;;;;;;;;;;;;;;;;;;;;;;GA0BG;AAEH,iBAAS,mBAAmB,CAAC,MAAM,EAAE,iBAAiB,GAAG,oBAAoB,CAsB5E;AAED,eAAe,mBAAmB,CAAA"}

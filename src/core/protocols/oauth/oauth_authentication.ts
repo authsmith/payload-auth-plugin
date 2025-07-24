@@ -169,38 +169,32 @@ export async function OAuthAuthentication(
 
   cookies = invalidateOAuthCookies(cookies)
 
-  // Get the intended redirect URL from the state or cookies
+  // Get the state data from cookies and pass it as a query parameter
   const parsedCookies = parseCookies(request.headers)
-  let redirectUrl = successRedirectPath
-
-  // Option 1: If you're using the manual state validation approach
   const cookieState = parsedCookies.get("__session-oauth-state")
-  if (cookieState) {
-    try {
-      const stateData = JSON.parse(cookieState)
-      if (stateData.redirectUrl) {
-        redirectUrl = stateData.redirectUrl
-      }
-    } catch (error) {
-      console.error("Failed to parse state data:", error)
-      // Fall back to default redirect path
-    }
-  }
-
-  console.log("Redirecting user to:", redirectUrl)
-
-  // Ensure the redirect URL is safe (starts with / or is a relative path)
-  if (
-    !redirectUrl.startsWith("/") &&
-    !redirectUrl.startsWith(payload.config.serverURL)
-  ) {
-    console.warn("Unsafe redirect URL detected, using default:", redirectUrl)
-    redirectUrl = successRedirectPath
-  }
 
   const successRedirectionURL = new URL(
-    `${payload.config.serverURL}${redirectUrl}`,
+    `${payload.config.serverURL}${successRedirectPath}`,
   )
+
+  // Add the state as a query parameter if it exists
+  if (cookieState) {
+    try {
+      // Validate that it's proper JSON
+      JSON.parse(cookieState)
+      // Add the state as a query parameter (URL encode it)
+      successRedirectionURL.searchParams.set(
+        "state",
+        encodeURIComponent(cookieState),
+      )
+      console.log("Added state to redirect URL:", cookieState)
+    } catch (error) {
+      console.error(
+        "Failed to parse state data, continuing without state:",
+        error,
+      )
+    }
+  }
 
   const res = new Response(null, {
     status: 302,
