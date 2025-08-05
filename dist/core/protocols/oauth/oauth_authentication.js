@@ -25,6 +25,7 @@ export async function OAuthAuthentication(pluginType, collections, allowOAuthAut
         const data = {
             email,
             name,
+            _verified: true,
         };
         const hasAuthEnabled = Boolean(payload.collections[collections.usersCollection]?.config.auth);
         if (hasAuthEnabled) {
@@ -41,8 +42,8 @@ export async function OAuthAuthentication(pluginType, collections, allowOAuthAut
     }
     const accountData = {
         scope,
-        name: name,
-        picture: picture,
+        name,
+        picture,
         issuerName: issuer,
         access_token,
     };

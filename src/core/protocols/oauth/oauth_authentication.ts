@@ -59,6 +59,7 @@ export async function OAuthAuthentication(
     const data: Record<string, unknown> = {
       email,
       name,
+      _verified: true,
     }
     const hasAuthEnabled = Boolean(
       payload.collections[collections.usersCollection]?.config.auth,
@@ -79,8 +80,8 @@ export async function OAuthAuthentication(
 
   const accountData: Record<string, unknown> = {
     scope,
-    name: name,
-    picture: picture,
+    name,
+    picture,
     issuerName: issuer,
     access_token,
   }
