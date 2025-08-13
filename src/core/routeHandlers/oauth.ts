@@ -82,6 +82,7 @@ export function OAuthHandlers(
             secret,
             successRedirectPath,
             errorRedirectPath,
+            additionalScope,
           )
         }
         default:
