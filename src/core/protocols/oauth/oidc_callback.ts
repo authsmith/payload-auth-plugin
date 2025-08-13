@@ -23,6 +23,7 @@ export async function OIDCCallback(
   secret: string,
   successRedirectPath: string,
   errorRedirectPath: string,
+  additionalScope?: string,
 ): Promise<Response> {
   const parsedCookies = parseCookies(request.headers)
 
@@ -116,7 +117,8 @@ export async function OIDCCallback(
     email: result.email,
     name: result.name ?? "",
     sub: result.sub,
-    scope: providerConfig.scope,
+    scope:
+      providerConfig.scope + (additionalScope ? ` ${additionalScope}` : ""),
     issuer: providerConfig.issuer,
     picture: result.picture ?? "",
     access_token: token_result.access_token,

@@ -1,8 +1,11 @@
 /// <reference lib="dom" />
 /// <reference lib="dom.iterable" />
+import Cookies from "js-cookie"
+
 type BaseOptions = {
   name: string
   baseURL: string
+  additionalScope?: string
 }
 
 export type OauthProvider =
@@ -22,6 +25,9 @@ export type OauthProvider =
   | "okta"
 
 export const oauth = (options: BaseOptions, provider: OauthProvider): void => {
+  const additionalScope = options.additionalScope || ""
+  Cookies.set("oauth_scope", additionalScope, { expires: 1 / 288, path: "/" })
+
   const oauthURL = `${options.baseURL}/api/${options.name}/oauth/authorization/${provider}`
   window.location.href = oauthURL
 }

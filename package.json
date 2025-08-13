@@ -78,6 +78,7 @@
     "@tsconfig/strictest": "^2.0.5",
     "@types/bun": "latest",
     "@types/jsonwebtoken": "^9.0.7",
+    "@types/js-cookie": "^3.0.6",
     "cross-env": "^7.0.3",
     "git-cliff": "2.7.0",
     "globals": "^15.14.0",
@@ -88,6 +89,7 @@
     "@simplewebauthn/browser": "^13.1.0",
     "@simplewebauthn/server": "^13.1.0",
     "jose": "6.0.8",
+    "js-cookie": "3.0.5",
     "oauth4webapi": "^3.1.4",
     "qs-esm": "7.0.2",
     "uuid": "11.1.0"

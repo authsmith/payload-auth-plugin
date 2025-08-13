@@ -18,6 +18,7 @@ export async function OAuth2Callback(
   secret: string,
   successRedirectPath: string,
   errorRedirectPath: string,
+  additionalScope?: string,
 ): Promise<Response> {
   const parsedCookies = parseCookies(request.headers)
 
@@ -82,7 +83,8 @@ export async function OAuth2Callback(
     email: userInfo.email,
     name: userInfo.name ?? "",
     sub: userInfo.sub,
-    scope: providerConfig.scope,
+    scope:
+      providerConfig.scope + (additionalScope ? ` ${additionalScope}` : ""),
     issuer: providerConfig.authorization_server.issuer,
     picture: userInfo.picture ?? "",
     access_token: token_result.access_token,
