@@ -122,6 +122,11 @@ export async function OIDCCallback(
     issuer: providerConfig.issuer,
     picture: result.picture ?? "",
     access_token: token_result.access_token,
+    refresh_token: token_result.refresh_token ?? "",
+    expires_in:
+      typeof token_result.expires_in === "number"
+        ? token_result.expires_in
+        : undefined,
   }
 
   return await OAuthAuthentication(
