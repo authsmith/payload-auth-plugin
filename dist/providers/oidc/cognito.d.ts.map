@@ -1,1 +1,0 @@
-{"version":3,"file":"cognito.d.ts","sourceRoot":"","sources":["../../../src/providers/oidc/cognito.ts"],"names":[],"mappings":"AAAA,OAAO,KAAK,EAEV,kBAAkB,EAClB,uBAAuB,EACxB,MAAM,gBAAgB,CAAA;AAEvB,UAAU,iBAAkB,SAAQ,uBAAuB;IACzD,MAAM,EAAE,MAAM,CAAA;CACf;AAED;;;;;;;;;;;;;;;;;;;;;;;;;;;GA2BG;AAEH,iBAAS,mBAAmB,CAAC,MAAM,EAAE,iBAAiB,GAAG,kBAAkB,CAmB1E;AAED,eAAe,mBAAmB,CAAA"}

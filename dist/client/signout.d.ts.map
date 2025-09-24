@@ -1,1 +1,0 @@
-{"version":3,"file":"signout.d.ts","sourceRoot":"","sources":["../../src/client/signout.ts"],"names":[],"mappings":"AACA,OAAO,EAAE,WAAW,EAAyB,MAAM,aAAa,CAAA;AAGhE,UAAU,WAAW;IACnB,IAAI,EAAE,MAAM,CAAA;IACZ,QAAQ,CAAC,EAAE,MAAM,GAAG,SAAS,CAAA;IAC7B,OAAO,EAAE,MAAM,CAAA;CAChB;AAED,eAAO,MAAM,OAAO,GAAU,MAAM,WAAW;;;;;;EA+B9C,CAAA"}

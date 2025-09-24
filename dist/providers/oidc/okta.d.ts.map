@@ -1,1 +1,0 @@
-{"version":3,"file":"okta.d.ts","sourceRoot":"","sources":["../../../src/providers/oidc/okta.ts"],"names":[],"mappings":"AAAA,OAAO,KAAK,EAEV,kBAAkB,EAClB,uBAAuB,EACxB,MAAM,gBAAgB,CAAA;AAEvB,UAAU,cAAe,SAAQ,uBAAuB;IACtD,MAAM,EAAE,MAAM,CAAA;CACf;AA6CD,iBAAS,gBAAgB,CAAC,MAAM,EAAE,cAAc,GAAG,kBAAkB,CAyBpE;AAED,eAAe,gBAAgB,CAAA"}

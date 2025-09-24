@@ -1,1 +1,0 @@
-{"version":3,"file":"twitch.d.ts","sourceRoot":"","sources":["../../../src/providers/oauth2/twitch.ts"],"names":[],"mappings":"AACA,OAAO,KAAK,EACV,oBAAoB,EAEpB,uBAAuB,EACxB,MAAM,gBAAgB,CAAA;AASvB,KAAK,gBAAgB,GAAG,uBAAuB,CAAA;AAE/C;;;;;;;;;;;;;;;;;;;;;;;;;;;GA2BG;AAEH,iBAAS,kBAAkB,CAAC,MAAM,EAAE,gBAAgB,GAAG,oBAAoB,CA2B1E;AAED,eAAe,kBAAkB,CAAA"}
