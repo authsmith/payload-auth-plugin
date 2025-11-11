@@ -81,7 +81,7 @@ export async function OAuth2Callback(
   const userData = {
     email: userInfo.email,
     name: userInfo.name ?? "",
-    sub: userInfo.sub,
+    sub: userInfo.sub ?? userInfo.id,
     scope: providerConfig.scope,
     issuer: providerConfig.authorization_server.issuer,
     picture: userInfo.picture ?? "",
