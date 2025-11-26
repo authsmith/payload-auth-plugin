@@ -1,5 +1,10 @@
 import * as jose from "jose"
-import type { JsonObject, PayloadRequest, TypeWithID } from "payload"
+import type {
+  JsonObject,
+  PayloadRequest,
+  SanitizedCollectionConfig,
+  TypeWithID,
+} from "payload"
 import { APP_COOKIE_SUFFIX } from "../../../constants.js"
 import {
   MissingCollection,
@@ -153,6 +158,7 @@ export async function OAuthAuthentication(
         collection: collections.usersCollection,
       },
       useAdmin ? collectionConfig?.auth.tokenExpiration : undefined,
+      collectionConfig.auth as SanitizedCollectionConfig["auth"] || false,
     )),
   ]
   cookies = invalidateOAuthCookies(cookies)
