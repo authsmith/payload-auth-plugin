@@ -6,7 +6,10 @@
   "author": "Sourab Pramanik<shubpramanik241@gmail.com>",
   "license": "MIT",
   "homepage:": "https://github.com/authsmith/payload-auth-plugin",
-  "repository": "git@github.com:authsmith/payload-auth-plugin.git",
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/authsmith/payload-auth-plugin.git"
+  },
   "description": "Authentication plugin for Payload CMS",
   "main": "dist/esm/index.js",
   "types": "dist/types/index.d.ts",
