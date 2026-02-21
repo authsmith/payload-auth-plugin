@@ -93,6 +93,7 @@ export async function OAuth2Callback(
       typeof token_result.expires_in === "number"
         ? token_result.expires_in
         : undefined,
+    claims: {}, // TODO: Take a look how claims work with OAuth2
   }
 
   return await OAuthAuthentication(
