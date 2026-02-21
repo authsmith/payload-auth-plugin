@@ -52,7 +52,7 @@ function MicrosoftEntraAuthProvider(
     ...restConfig,
     id: "msft-entra",
     scope: overrideScope ?? "openid profile email offline_access",
-    issuer: `https://login.microsoftonline.com/${config.tenant_id}/v2.0`,
+    issuer: `https://${config.tenant_id}.ciamlogin.com/${config.tenant_id}/v2.0`,
     name: "Microsoft Entra",
     algorithm: "oidc",
     kind: "oauth",
