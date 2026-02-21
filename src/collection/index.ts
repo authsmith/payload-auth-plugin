@@ -59,6 +59,11 @@ export const withUsersCollection = (
       label: "Verification Kind",
       type: "text",
     },
+    {
+        name: "claims",
+        label: "Claims",
+        type: "json",
+    }
   ]
   if (!incomingCollection.fields?.find((field) => field.type === "email")) {
     baseFields.push({

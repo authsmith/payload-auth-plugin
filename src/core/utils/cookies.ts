@@ -1,13 +1,18 @@
 import * as jwt from "jose"
-import { getCookieExpiration } from "payload"
+import {
+  getCookieExpiration,
+  generateCookie,
+} from "payload"
+import type { SanitizedCollectionConfig } from "payload"
 
 export async function createSessionCookies(
   name: string,
   secret: string,
   fieldsToSign: Record<string, unknown>,
   expiration?: number,
+  collectionAuthConfig?: SanitizedCollectionConfig["auth"] | false,
 ) {
-  const tokenExpiration =
+  const tokenExpiration: number =
     expiration ??
     getCookieExpiration({
       seconds: 7200,
@@ -23,9 +28,29 @@ export async function createSessionCookies(
     .sign(secretKey)
 
   const cookies: string[] = []
-  cookies.push(
-    `${name}=${token};Path=/;HttpOnly;SameSite=lax;Expires=${getCookieExpiration({ seconds: expiration! }).toUTCString()}`,
-  )
+
+  if (collectionAuthConfig) {
+    const sameSite = typeof collectionAuthConfig.cookies.sameSite === 'string' ? collectionAuthConfig.cookies.sameSite : collectionAuthConfig.cookies.sameSite ? 'Strict' : undefined;
+    const cookie =  generateCookie({
+      name: name,
+      domain: collectionAuthConfig.cookies.domain ?? undefined,
+      expires: getCookieExpiration({ seconds: expiration! }),
+      httpOnly: true,
+      path: '/',
+      returnCookieAsObject: false,
+      sameSite,
+      secure: collectionAuthConfig.cookies.secure,
+      value: token
+    }) as string;
+    
+    cookies.push(cookie);
+    
+  } else {
+    cookies.push(
+      `${name}=${token};Path=/;HttpOnly;SameSite=lax;Expires=${getCookieExpiration({ seconds: expiration! }).toUTCString()}`,
+    )
+  }
+
   return cookies
 }
 

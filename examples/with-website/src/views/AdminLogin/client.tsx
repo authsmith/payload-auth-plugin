@@ -1,18 +1,17 @@
 'use client'
 
 import React from 'react'
-import { signin } from 'payload-auth-plugin/client'
-import { useRouter } from 'next/navigation'
-import { Button, toast } from '@payloadcms/ui'
-const AdminLoginViewClient = () => {
-  const { oauth } = signin({ name: 'admin' })
 
-  const handleGoogleSignin = async () => {
-    await oauth('google')
-  }
-  const handleAuth0Signin = async () => {
-    await oauth('auth0')
-  }
+import { Button } from '@payloadcms/ui'
+import { adminAuthClient } from '@/lib/auth'
+
+const AdminLoginViewClient = () => {
+  const { oauth } = adminAuthClient.signin()
+  
+  const handleGoogleSignin = async () => oauth('google')
+  const handleAuth0Signin = async () => oauth('auth0')
+  const handleMicrosoftSignin = async () => oauth('msft-entra')
+
   return (
     <div className="w-full h-full bg-red-500">
       <div className="flex flex-col items-start gap-y-4">
@@ -21,6 +20,9 @@ const AdminLoginViewClient = () => {
         </Button>
         <Button type="button" onClick={handleAuth0Signin}>
           Signin with Auth0
+        </Button>
+        <Button type="button" onClick={handleMicrosoftSignin}>
+          Signin with Microsoft
         </Button>
       </div>
     </div>

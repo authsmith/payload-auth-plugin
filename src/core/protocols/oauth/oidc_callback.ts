@@ -127,6 +127,7 @@ export async function OIDCCallback(
       typeof token_result.expires_in === "number"
         ? token_result.expires_in
         : undefined,
+    claims,
   }
 
   return await OAuthAuthentication(

@@ -1,5 +1,10 @@
 import * as jose from "jose"
-import type { JsonObject, PayloadRequest, TypeWithID } from "payload"
+import type {
+  JsonObject,
+  PayloadRequest,
+  SanitizedCollectionConfig,
+  TypeWithID,
+} from "payload"
 import { APP_COOKIE_SUFFIX } from "../../../constants.js"
 import {
   MissingCollection,
@@ -34,6 +39,7 @@ export async function OAuthAuthentication(
     access_token: string
     refresh_token?: string
     expires_in?: number
+    claims: Record<string, unknown>
   },
 ): Promise<Response> {
   const {
@@ -46,6 +52,7 @@ export async function OAuthAuthentication(
     access_token,
     refresh_token,
     expires_in,
+    claims,
   } = account
   const { payload } = request
 
@@ -131,12 +138,14 @@ export async function OAuthAuthentication(
     const tokenExpInMs = collectionConfig.auth.tokenExpiration * 1000
     const expiresAt = new Date(now.getTime() + tokenExpInMs)
     const session = { id: sessionID, createdAt: now, expiresAt }
-    if (!userRecord["sessions"]?.length) {
-      userRecord["sessions"] = [session]
+
+    if (!userRecord?.sessions?.length) {
+      userRecord.sessions = [session]
     } else {
       userRecord.sessions = removeExpiredSessions(userRecord.sessions)
       userRecord.sessions.push(session)
     }
+    userRecord.claims = claims
     await payload.db.updateOne({
       id: userRecord.id,
       collection: collections.usersCollection,
@@ -159,6 +168,7 @@ export async function OAuthAuthentication(
         collection: collections.usersCollection,
       },
       useAdmin ? collectionConfig?.auth.tokenExpiration : undefined,
+      collectionConfig.auth as SanitizedCollectionConfig["auth"] || false,
     )),
   ]
   cookies = invalidateOAuthCookies(cookies)

@@ -86,6 +86,7 @@
     "typescript": "^5.7.3"
   },
   "dependencies": {
+    "@payloadcms/db-postgres": "3.48.0",
     "@simplewebauthn/browser": "^13.1.0",
     "@simplewebauthn/server": "^13.1.0",
     "jose": "6.0.8",
