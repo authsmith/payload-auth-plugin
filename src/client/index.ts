@@ -1,17 +1,17 @@
+import { MissingPayloadAuthBaseURL } from "../core/errors/consoleErrors.js"
 import {
-  resetPassword,
   forgotPassword,
   recoverPassword,
-  type PasswordResetPayload,
+  resetPassword,
   type ForgotPasswordPayload,
   type PasswordRecoverPayload,
+  type PasswordResetPayload,
 } from "./password.js"
 import { refresh } from "./refresh.js"
-import { signin } from "./signin.js"
 import { register } from "./register.js"
-import { getSession, getClientSession } from "./session.js"
+import { getClientSession, getSession } from "./session.js"
+import { signin } from "./signin.js"
 import { signout } from "./signout.js"
-import { MissingPayloadAuthBaseURL } from "../core/errors/consoleErrors.js"
 
 class AuthClient {
   private baseURL: string
@@ -32,10 +32,16 @@ class AuthClient {
       (process.env.NEXT_PUBLIC_PAYLOAD_AUTH_URL as string)
   }
 
-  signin() {
+  /**
+   * Sign in a user
+   * @param additionalScope - Additional scope to request
+   * @returns The sign in response
+   */
+  signin(additionalScope?: string) {
     return signin({
       name: this.name,
       baseURL: this.baseURL,
+      additionalScope,
     })
   }
   register() {

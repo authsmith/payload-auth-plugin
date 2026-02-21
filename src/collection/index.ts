@@ -154,6 +154,14 @@ export const withAccountCollection = (
       type: "text",
     },
     {
+      name: "refresh_token",
+      type: "text",
+    },
+    {
+      name: "expires_in",
+      type: "number",
+    },
+    {
       name: "passkey",
       type: "group",
       fields: [

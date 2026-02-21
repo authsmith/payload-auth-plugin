@@ -1,12 +1,13 @@
 import * as oauth from "oauth4webapi"
+import type { PayloadRequest } from "payload"
 import type { OIDCProviderConfig } from "../../../types.js"
 import { getCallbackURL } from "../../utils/cb.js"
-import type { PayloadRequest } from "payload"
 
 export async function OIDCAuthorization(
   pluginType: string,
   request: PayloadRequest,
   providerConfig: OIDCProviderConfig,
+  additionalScope?: string,
 ): Promise<Response> {
   const callback_url = getCallbackURL(
     request.payload.config.serverURL,
@@ -33,7 +34,12 @@ export async function OIDCAuthorization(
   authorizationURL.searchParams.set("client_id", client.client_id)
   authorizationURL.searchParams.set("redirect_uri", callback_url.toString())
   authorizationURL.searchParams.set("response_type", "code")
-  authorizationURL.searchParams.set("scope", scope as string)
+  if (additionalScope) {
+    const totalScope = `${scope} ${additionalScope}`
+    authorizationURL.searchParams.set("scope", totalScope)
+  } else {
+    authorizationURL.searchParams.set("scope", scope as string)
+  }
   authorizationURL.searchParams.set("code_challenge", code_challenge)
   authorizationURL.searchParams.set(
     "code_challenge_method",

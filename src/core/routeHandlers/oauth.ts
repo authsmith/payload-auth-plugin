@@ -1,14 +1,15 @@
 import type { PayloadRequest } from "payload"
+import { parseCookies } from "payload"
 import type { OAuthProviderConfig } from "../../types.js"
 import {
   InvalidOAuthAlgorithm,
   InvalidOAuthResource,
   InvalidProvider,
 } from "../errors/consoleErrors.js"
-import { OIDCAuthorization } from "../protocols/oauth/oidc_authorization.js"
 import { OAuth2Authorization } from "../protocols/oauth/oauth2_authorization.js"
-import { OIDCCallback } from "../protocols/oauth/oidc_callback.js"
 import { OAuth2Callback } from "../protocols/oauth/oauth2_callback.js"
+import { OIDCAuthorization } from "../protocols/oauth/oidc_authorization.js"
+import { OIDCCallback } from "../protocols/oauth/oidc_callback.js"
 
 export function OAuthHandlers(
   pluginType: string,
@@ -30,13 +31,27 @@ export function OAuthHandlers(
 
   const resource = request.routeParams?.resource as string
 
+  const headers = request.headers
+  const cookies = parseCookies(headers)
+  const additionalScope = cookies.get("oauth_scope")
+
   switch (resource) {
     case "authorization":
       switch (provider.algorithm) {
         case "oidc":
-          return OIDCAuthorization(pluginType, request, provider)
+          return OIDCAuthorization(
+            pluginType,
+            request,
+            provider,
+            additionalScope,
+          )
         case "oauth2":
-          return OAuth2Authorization(pluginType, request, provider)
+          return OAuth2Authorization(
+            pluginType,
+            request,
+            provider,
+            additionalScope,
+          )
         default:
           throw new InvalidOAuthAlgorithm()
       }
@@ -53,6 +68,7 @@ export function OAuthHandlers(
             secret,
             successRedirectPath,
             errorRedirectPath,
+            additionalScope,
           )
         }
         case "oauth2": {
@@ -66,6 +82,7 @@ export function OAuthHandlers(
             secret,
             successRedirectPath,
             errorRedirectPath,
+            additionalScope,
           )
         }
         default:

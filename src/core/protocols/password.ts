@@ -1,4 +1,7 @@
 import { parseCookies, type PayloadRequest } from "payload"
+import { v4 as uuid } from "uuid"
+import { APP_COOKIE_SUFFIX } from "../../constants.js"
+import { SuccessKind } from "../../types.js"
 import {
   EmailAlreadyExistError,
   InvalidCredentials,
@@ -8,16 +11,13 @@ import {
   UnauthorizedAPIRequest,
   UserNotFoundAPIError,
 } from "../errors/apiErrors.js"
-import { hashPassword, verifyPassword } from "../utils/password.js"
-import { SuccessKind } from "../../types.js"
-import { ephemeralCode, verifyEphemeralCode } from "../utils/hash.js"
-import { APP_COOKIE_SUFFIX } from "../../constants.js"
 import {
   createSessionCookies,
   invalidateOAuthCookies,
   verifySessionCookie,
 } from "../utils/cookies.js"
-import { v4 as uuid } from "uuid"
+import { ephemeralCode, verifyEphemeralCode } from "../utils/hash.js"
+import { hashPassword, verifyPassword } from "../utils/password.js"
 import { removeExpiredSessions } from "../utils/session.js"
 
 const redirectWithSession = async (
@@ -92,13 +92,13 @@ export const PasswordSignin = async (
     return new InvalidCredentials()
   }
 
-  const isVerifed = await verifyPassword(
+  const isVerified = await verifyPassword(
     body.password,
     userRecord.hashedPassword,
     userRecord.hashSalt,
     userRecord.hashIterations,
   )
-  if (!isVerifed) {
+  if (!isVerified) {
     return new InvalidCredentials()
   }
 
@@ -456,13 +456,13 @@ export const ResetPassword = async (
   }
 
   const user = docs[0]
-  const isVerifed = await verifyPassword(
+  const isVerified = await verifyPassword(
     body.currentPassword,
     user.hashedPassword,
     user.hashSalt,
     user.hashIterations,
   )
-  if (!isVerifed) {
+  if (!isVerified) {
     return new InvalidCredentials()
   }
 

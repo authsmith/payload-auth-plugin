@@ -111,6 +111,8 @@ export interface AccountInfo {
     backedUp: boolean
   }
   access_token?: string
+  refresh_token?: string
+  expires_in?: number
 }
 
 export type PasswordProviderConfig = {

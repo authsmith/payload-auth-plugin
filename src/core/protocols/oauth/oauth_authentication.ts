@@ -37,6 +37,8 @@ export async function OAuthAuthentication(
     issuer: string
     picture?: string | undefined
     access_token: string
+    refresh_token?: string
+    expires_in?: number
     claims: Record<string, unknown>
   },
 ): Promise<Response> {
@@ -48,6 +50,8 @@ export async function OAuthAuthentication(
     issuer,
     picture,
     access_token,
+    refresh_token,
+    expires_in,
     claims,
   } = account
   const { payload } = request
@@ -93,6 +97,8 @@ export async function OAuthAuthentication(
     picture: picture,
     issuerName: issuer,
     access_token,
+    refresh_token,
+    expires_in,
   }
 
   const accountRecords = await payload.find({
