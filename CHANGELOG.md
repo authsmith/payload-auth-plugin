@@ -2,6 +2,31 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.7.5] - 2026-02-21
+
+### 🚀 Features
+
+- *(oauth)* Add support for additional scope in oauth flow
+- *(oauth)* Add additionalScope parameter to OAuthHandlers
+- *(oauth)* Add refresh_token and expires_in fields to oauth flow
+- Added claims to users
+- Using ciamlogin.com instead of .microsoftonline.com as the latter only supports work and school accounts. Microsoft Entra uses ciamlogin.com for everything
+
+### 🐛 Bug Fixes
+
+- *(password)* Correct typo in variable name isVerified
+- Add support for payload auth cookie settings to be added to the token.
+- Missing claims:w
+
+### ⚙️ Miscellaneous Tasks
+
+- Release v0.7.4
+- Added Microsoft example
+- Added support for postgres in example
+- Deleted examples/with-website/start_db.sh
+- Cleanup
+- Cleanup
+
 ## [0.7.4] - 2025-07-19
 
 ### 🚀 Features
