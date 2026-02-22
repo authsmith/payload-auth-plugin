@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.7.6] - 2026-02-22
+
+### 🐛 Bug Fixes
+
+- Peer deps
+
 ## [0.7.5] - 2026-02-21
 
 ### 🚀 Features
@@ -26,6 +32,7 @@ All notable changes to this project will be documented in this file.
 - Deleted examples/with-website/start_db.sh
 - Cleanup
 - Cleanup
+- Release v0.7.5
 
 ## [0.7.4] - 2025-07-19
 
