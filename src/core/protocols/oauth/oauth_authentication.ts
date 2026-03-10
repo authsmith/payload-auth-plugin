@@ -167,7 +167,7 @@ export async function OAuthAuthentication(
         sid: sessionID,
         collection: collections.usersCollection,
       },
-      useAdmin ? collectionConfig?.auth.tokenExpiration : undefined,
+      collectionConfig?.auth.tokenExpiration,
       collectionConfig.auth as SanitizedCollectionConfig["auth"] || false,
     )),
   ]

@@ -146,7 +146,7 @@ export const PasswordSignin = async (
     secret,
     signinFields,
     request,
-    useAdmin ? collectionConfig.auth.tokenExpiration : undefined,
+    collectionConfig.auth.tokenExpiration,
   )
 }
 
@@ -250,7 +250,7 @@ export const PasswordSignup = async (
       secret,
       signinFields,
       request,
-      useAdmin ? collectionConfig.auth.tokenExpiration : undefined,
+      collectionConfig.auth.tokenExpiration,
     )
   }
 
