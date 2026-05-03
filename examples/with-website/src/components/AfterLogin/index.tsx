@@ -1,10 +1,9 @@
 'use client'
 
 import './styles.scss'
-import React from 'react'
 
-import { Button } from '@payloadcms/ui'
 import { adminAuthClient } from '@/lib/auth'
+import { Button } from '@payloadcms/ui'
 
 export const AdminLogin = () => {
   const { oauth } = adminAuthClient.signin()
@@ -12,7 +11,7 @@ export const AdminLogin = () => {
   const handleGoogleSignin = async () => oauth('google')
   const handleAuth0Signin = async () => oauth('auth0')
   const handleMicrosoftSignin = async () => oauth('msft-entra')
-  const handleRoboloxSignin = async () => oauth('robolox')
+  const handleRobloxSignin = async () => oauth('roblox')
 
   return (
     <div className="oauth-container">
@@ -25,8 +24,8 @@ export const AdminLogin = () => {
       <Button type="button" onClick={handleMicrosoftSignin} className="oauth-btn">
         Signin with Microsoft
       </Button>
-      <Button type="button" onClick={handleRoboloxSignin} className="oauth-btn">
-        Signin with Robolox
+      <Button type="button" onClick={handleRobloxSignin} className="oauth-btn">
+        Signin with Roblox
       </Button>
     </div>
   )

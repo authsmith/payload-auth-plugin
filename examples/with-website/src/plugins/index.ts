@@ -1,33 +1,33 @@
+import { revalidateRedirects } from '@/hooks/revalidateRedirects'
+import { beforeSyncWithSearch } from '@/search/beforeSync'
+import { searchFields } from '@/search/fieldOverrides'
 import { payloadCloudPlugin } from '@payloadcms/payload-cloud'
 import { formBuilderPlugin } from '@payloadcms/plugin-form-builder'
 import { nestedDocsPlugin } from '@payloadcms/plugin-nested-docs'
 import { redirectsPlugin } from '@payloadcms/plugin-redirects'
-import { seoPlugin } from '@payloadcms/plugin-seo'
 import { searchPlugin } from '@payloadcms/plugin-search'
-import type { Plugin } from 'payload'
-import { revalidateRedirects } from '@/hooks/revalidateRedirects'
+import { seoPlugin } from '@payloadcms/plugin-seo'
 import type { GenerateTitle, GenerateURL } from '@payloadcms/plugin-seo/types'
 import { FixedToolbarFeature, HeadingFeature, lexicalEditor } from '@payloadcms/richtext-lexical'
-import { searchFields } from '@/search/fieldOverrides'
-import { beforeSyncWithSearch } from '@/search/beforeSync'
+import type { Plugin } from 'payload'
 
+import { AdminUsers } from '@/collections/Auth/Admin/Users'
 import type { Page, Post } from '@/payload-types'
 import { getServerSideURL } from '@/utilities/getURL'
-import { AdminUsers } from '@/collections/Auth/Admin/Users'
 
+import { AdminAccounts } from '@/collections/Auth/Admin/Accounts'
+import { AppUsersAccounts } from '@/collections/Auth/App/Accounts'
+import { AppUsers } from '@/collections/Auth/App/Users'
+import { renderForgotPasswordTemplate } from '@/templates/forgot-password'
 import { authPlugin } from 'payload-auth-plugin'
 import {
   Auth0AuthProvider,
   GoogleAuthProvider,
   MicrosoftEntraAuthProvider,
   PasswordProvider,
+  RobloxAuthProvider,
   TwitchAuthProvider,
-  RoboloxAuthProvider,
 } from 'payload-auth-plugin/providers'
-import { AdminAccounts } from '@/collections/Auth/Admin/Accounts'
-import { AppUsers } from '@/collections/Auth/App/Users'
-import { AppUsersAccounts } from '@/collections/Auth/App/Accounts'
-import { renderForgotPasswordTemplate } from '@/templates/forgot-password'
 
 const generateTitle: GenerateTitle<Post | Page> = ({ doc }) => {
   return doc?.title ? `${doc.title} | Payload Website Template` : 'Payload Website Template'
@@ -114,7 +114,7 @@ export const plugins: Plugin[] = [
     successRedirectPath: '/',
     errorRedirectPath: '/auth/signin',
     providers: [
-      RoboloxAuthProvider({
+      RobloxAuthProvider({
         client_id: process.env.ROBOLOX_CLIENT_ID as string,
         client_secret: process.env.ROBOLOX_CLIENT_SECRET as string,
       }),

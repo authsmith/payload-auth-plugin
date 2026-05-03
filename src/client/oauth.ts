@@ -23,7 +23,7 @@ export type OauthProvider =
   | "jumpcloud"
   | "twitch"
   | "okta"
-  | "robolox"
+  | "roblox"
 
 export const oauth = (options: BaseOptions, provider: OauthProvider): void => {
   const additionalScope = options.additionalScope || ""

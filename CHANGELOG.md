@@ -7,8 +7,8 @@ All notable changes to this project will be documented in this file.
 ### 🚀 Features
 
 - Api key
-- Adds robolox auth provider
-- Adds robolox auth provider
+- Adds roblox auth provider
+- Adds roblox auth provider
 - Updates build process
 
 ### 🐛 Bug Fixes

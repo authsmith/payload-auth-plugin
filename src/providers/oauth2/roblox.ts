@@ -4,9 +4,8 @@ import type {
   OAuth2ProviderConfig,
   OAuthBaseProviderConfig,
 } from "../../types.js"
-import { defaultTimezones } from "payload/shared"
 
-type RoboloxAuthConfig = OAuthBaseProviderConfig
+type RobloxAuthConfig = OAuthBaseProviderConfig
 
 const authorization_server: AuthorizationServer = {
   issuer: "https://apis.roblox.com/oauth/",
@@ -16,12 +15,12 @@ const authorization_server: AuthorizationServer = {
 }
 
 /**
- * Add Robolox OAuth2 Provider
+ * Add Roblox OAuth2 Provider
  *
  * #### Callback or Redirect URL pattern
  *
  * ```
- * https://example.com/api/{name}/oauth/callback/robolox
+ * https://example.com/api/{name}/oauth/callback/roblox
  * ```
  *
  * #### Plugin Setup
@@ -29,12 +28,12 @@ const authorization_server: AuthorizationServer = {
  * ```ts
  * import { Plugin } from 'payload'
  * import {authPlugin} from "payload-auth-plugin"
- * import {RoboloxAuthProvider} from "payload-auth-plugin/providers"
+ * import {RobloxAuthProvider} from "payload-auth-plugin/providers"
  *
  * export const plugins: Plugin[] = [
  *  authPlugin({
  *    providers:[
- *      RoboloxAuthProvider({
+ *      RobloxAuthProvider({
  *          client_id: process.env.ROBOLOX_CLIENT_ID as string,
  *          client_secret: process.env.ROBOLOR_CLIENT_SECRET as string,
  *      })
@@ -45,15 +44,15 @@ const authorization_server: AuthorizationServer = {
  *
  */
 
-function RoboloxAuthProvider(config: RoboloxAuthConfig): OAuth2ProviderConfig {
+function RobloxAuthProvider(config: RobloxAuthConfig): OAuth2ProviderConfig {
   const { overrideScope, ...restConfig } = config
 
   return {
     ...restConfig,
-    id: "robolox",
+    id: "roblox",
     scope: overrideScope ?? "openid email profile",
     authorization_server,
-    name: "Robolox",
+    name: "Roblox",
     algorithm: "oauth2",
     kind: "oauth",
     profile: (profile): AccountInfo => {
@@ -67,4 +66,4 @@ function RoboloxAuthProvider(config: RoboloxAuthConfig): OAuth2ProviderConfig {
   }
 }
 
-export default RoboloxAuthProvider
+export default RobloxAuthProvider
