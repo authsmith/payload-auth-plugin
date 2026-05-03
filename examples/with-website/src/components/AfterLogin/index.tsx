@@ -12,6 +12,7 @@ export const AdminLogin = () => {
   const handleGoogleSignin = async () => oauth('google')
   const handleAuth0Signin = async () => oauth('auth0')
   const handleMicrosoftSignin = async () => oauth('msft-entra')
+  const handleRoboloxSignin = async () => oauth('robolox')
 
   return (
     <div className="oauth-container">
@@ -23,6 +24,9 @@ export const AdminLogin = () => {
       </Button>
       <Button type="button" onClick={handleMicrosoftSignin} className="oauth-btn">
         Signin with Microsoft
+      </Button>
+      <Button type="button" onClick={handleRoboloxSignin} className="oauth-btn">
+        Signin with Robolox
       </Button>
     </div>
   )
