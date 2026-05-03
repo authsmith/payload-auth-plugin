@@ -28,42 +28,50 @@ export const withUsersCollection = (
       name: "hashedPassword",
       type: "text",
       unique: true,
+      hidden: true,
     },
     {
       name: "hashSalt",
       type: "text",
       unique: true,
+      hidden: true,
     },
     {
       name: "hashIterations",
       type: "number",
+      hidden: true,
     },
     {
       name: "verificationCode",
       label: "Verification Code",
       type: "text",
+      hidden: true,
       unique: true,
     },
     {
       name: "verificationHash",
       label: "Verification Hash",
       type: "text",
+      hidden: true,
     },
     {
       name: "verificationTokenExpire",
       label: "Verification Token Expire",
       type: "number",
+      hidden: true,
     },
     {
       name: "verificationKind",
       label: "Verification Kind",
       type: "text",
+      hidden: true,
     },
     {
-        name: "claims",
-        label: "Claims",
-        type: "json",
-    }
+      name: "claims",
+      label: "Claims",
+      type: "json",
+      hidden: true,
+    },
   ]
   if (!incomingCollection.fields?.find((field) => field.type === "email")) {
     baseFields.push({
