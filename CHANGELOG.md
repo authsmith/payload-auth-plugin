@@ -2,11 +2,28 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.7.7] - 2026-05-03
+
+### 🚀 Features
+
+- Api key
+- Adds robolox auth provider
+- Adds robolox auth provider
+- Updates build process
+
+### 🐛 Bug Fixes
+
+- Hide confidential fields
+
 ## [0.7.6] - 2026-02-22
 
 ### 🐛 Bug Fixes
 
 - Peer deps
+
+### ⚙️ Miscellaneous Tasks
+
+- Release v0.7.6
 
 ## [0.7.5] - 2026-02-21
 
