@@ -68,7 +68,7 @@
     "dist"
   ],
   "scripts": {
-    "build": "bun run ./script/build.ts",
+    "build": "tsup",
     "format": "bun x prettier --write '**/*.{js,jsx,ts,tsx,json,md,yaml,yml}'",
     "release": "bun run build && changeset publish"
   },
@@ -86,6 +86,7 @@
     "git-cliff": "2.7.0",
     "globals": "^15.14.0",
     "prettier": "3.4.2",
+    "tsup": "8.5.1",
     "typescript": "^5.7.3"
   },
   "dependencies": {
