@@ -37,7 +37,7 @@ function GoogleAuthProvider(config: GoogleAuthConfig): OIDCProviderConfig {
   const { overrideScope, ...restConfig } = config
 
   return {
-    ...config,
+    ...restConfig,
     id: "google",
     scope: overrideScope ?? "openid email profile",
     issuer: "https://accounts.google.com",

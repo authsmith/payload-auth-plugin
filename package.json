@@ -68,7 +68,7 @@
     "dist"
   ],
   "scripts": {
-    "build": "bun run ./script/build.ts",
+    "build": "tsup",
     "format": "bun x prettier --write '**/*.{js,jsx,ts,tsx,json,md,yaml,yml}'",
     "release": "bun run build && changeset publish"
   },
@@ -80,12 +80,13 @@
     "@tsconfig/node22": "^22.0.0",
     "@tsconfig/strictest": "^2.0.5",
     "@types/bun": "latest",
-    "@types/jsonwebtoken": "^9.0.7",
     "@types/js-cookie": "^3.0.6",
+    "@types/jsonwebtoken": "^9.0.7",
     "cross-env": "^7.0.3",
     "git-cliff": "2.7.0",
     "globals": "^15.14.0",
     "prettier": "3.4.2",
+    "tsup": "8.5.1",
     "typescript": "^5.7.3"
   },
   "dependencies": {
@@ -96,5 +97,6 @@
     "oauth4webapi": "^3.1.4",
     "qs-esm": "7.0.2",
     "uuid": "11.1.0"
-  }
+  },
+  "packageManager": "pnpm@10.17.1+sha512.17c560fca4867ae9473a3899ad84a88334914f379be46d455cbf92e5cf4b39d34985d452d2583baf19967fa76cb5c17bc9e245529d0b98745721aa7200ecaf7a"
 }

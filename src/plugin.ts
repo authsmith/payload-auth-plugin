@@ -46,6 +46,7 @@ import {
 } from "./core/endpoints.js"
 import { formatSlug } from "./core/utils/slug.js"
 import { preflightCollectionCheck } from "./core/preflights/collections.js"
+import { generateAPIKeysCollection } from "./collection/auto-generates/APIKeys.js"
 
 /**
  * Adds authentication to the Payload app.
@@ -209,13 +210,18 @@ export const authPlugin =
       new SessionEndpointStrategy({ usersCollectionSlug }),
     )
     const sessionEndpoints = endpointsFactory.createEndpoints("session")
-
-    config.endpoints = [
-      ...(config.endpoints ?? []),
-      ...oauthEndpoints,
-      ...passkeyEndpoints,
-      ...passwordEndpoints,
-      ...sessionEndpoints,
-    ]
-    return config
+    return {
+      ...config,
+      endpoints: [
+        ...(config.endpoints ?? []),
+        ...oauthEndpoints,
+        ...passkeyEndpoints,
+        ...passwordEndpoints,
+        ...sessionEndpoints,
+      ],
+      collections: [
+        ...(config.collections || []),
+        { ...generateAPIKeysCollection(config.collections ?? []) },
+      ],
+    }
   }

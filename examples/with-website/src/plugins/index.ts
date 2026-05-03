@@ -22,6 +22,7 @@ import {
   MicrosoftEntraAuthProvider,
   PasswordProvider,
   TwitchAuthProvider,
+  RoboloxAuthProvider,
 } from 'payload-auth-plugin/providers'
 import { AdminAccounts } from '@/collections/Auth/Admin/Accounts'
 import { AppUsers } from '@/collections/Auth/App/Users'
@@ -113,6 +114,10 @@ export const plugins: Plugin[] = [
     successRedirectPath: '/',
     errorRedirectPath: '/auth/signin',
     providers: [
+      RoboloxAuthProvider({
+        client_id: process.env.ROBOLOX_CLIENT_ID as string,
+        client_secret: process.env.ROBOLOX_CLIENT_SECRET as string,
+      }),
       GoogleAuthProvider({
         client_id: process.env.GOOGLE_CLIENT_ID as string,
         client_secret: process.env.GOOGLE_CLIENT_SECRET as string,
@@ -146,13 +151,13 @@ export const plugins: Plugin[] = [
         client_id: process.env.AUTH0_CLIENT_ID as string,
         client_secret: process.env.AUTH0_CLIENT_SECRET as string,
       }),
-	  MicrosoftEntraAuthProvider({
-		tenant_id: process.env.MSFT_ENTRA_TENANT_ID as string,
-		client_id: process.env.MSFT_AUTH_CLIENT_ID as string,
-		client_secret: process.env.MSFT_AUTH_CLIENT_SECRET as string,
+      MicrosoftEntraAuthProvider({
+        tenant_id: process.env.MSFT_ENTRA_TENANT_ID as string,
+        client_id: process.env.MSFT_AUTH_CLIENT_ID as string,
+        client_secret: process.env.MSFT_AUTH_CLIENT_SECRET as string,
 
-		skip_email_verification: true,
-	  })
+        skip_email_verification: true,
+      }),
     ],
   }),
 ]
