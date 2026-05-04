@@ -2,11 +2,21 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.7.9] - 2026-05-04
+
+### 🐛 Bug Fixes
+
+- Use payload updat function
+
 ## [0.7.8] - 2026-05-03
 
 ### 🐛 Bug Fixes
 
 - Provider name typo
+
+### ⚙️ Miscellaneous Tasks
+
+- Release v0.7.8
 
 ## [0.7.7] - 2026-05-03
 
