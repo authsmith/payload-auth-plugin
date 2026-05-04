@@ -146,12 +146,14 @@ export async function OAuthAuthentication(
       userRecord.sessions.push(session)
     }
     userRecord.claims = claims
-    await payload.db.updateOne({
-      id: userRecord.id,
+    await payload.update({
+      where: {
+        id: {
+          equals: userRecord.id
+        }
+      },
       collection: collections.usersCollection,
       data: userRecord,
-      req: request,
-      returning: false,
     })
   }
   const cookieName = useAdmin
