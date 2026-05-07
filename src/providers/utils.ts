@@ -1,9 +1,9 @@
 import { ProviderAlreadyExists } from "../core/errors/consoleErrors.js"
 import {
-  ProvidersConfig,
   OAuthProviderConfig,
   PasskeyProviderConfig,
   PasswordProviderConfig,
+  ProvidersConfig,
 } from "../types.js"
 
 /**
@@ -60,4 +60,28 @@ export function getPasswordProvider(
     return provider
   }
   return null
+}
+
+
+/**
+ * Function to generate custom email address for a provider by domain
+ */
+
+export function generateProviderCustomEmail(prefix: string, domain: string) {
+  const timestamp = Date.now().toString(36)
+  const random = Math.random().toString(36).slice(2, 8)
+  return `${prefix}_${timestamp}${random}@${domain}`
+}
+
+
+export function encodeString(s: string): number {
+  let h = 0
+  const l = s.length
+  let i = 0
+  if (l > 0) {
+    while (i < l) {
+      h = ((h << 5) - h + s.charCodeAt(i++)) | 0 // Bitwise operations to create a hash
+    }
+  }
+  return h
 }

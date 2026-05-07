@@ -1,7 +1,7 @@
 import type {
   AccountInfo,
-  OIDCProviderConfig,
   OAuthBaseProviderConfig,
+  OIDCProviderConfig,
 } from "../../types.js"
 
 interface OktaAuthConfig extends OAuthBaseProviderConfig {
@@ -28,9 +28,9 @@ interface OktaAuthConfig extends OAuthBaseProviderConfig {
  *  authPlugin({
  *    providers:[
  *      OktaAuthProvider({g,
- *          domain: process.env.KEYCLOAK_DOMAIN as string,
- *          client_id: process.env.KEYCLOAK_CLIENT_ID as string,
- *          client_secret: process.env.KEYCLOAK_CLIENT_SECRET as string,
+ *          domain: process.env.OKTA_DOMAIN as string,
+ *          client_id: process.env.OKTA_CLIENT_ID as string,
+ *          client_secret: process.env.OKTA_CLIENT_SECRET as string,
  *      })
  *    ]
  *  })

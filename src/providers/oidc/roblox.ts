@@ -1,29 +1,23 @@
-import type { AuthorizationServer } from "oauth4webapi"
-import { InvalidDomain } from "../../core/errors/consoleErrors.js"
+
+import { InvalidDomain } from "../../core/errors/consoleErrors.js";
 import type {
   AccountInfo,
-  OAuth2ProviderConfig,
   OAuthBaseProviderConfig,
-} from "../../types.js"
+  OIDCProviderConfig,
+} from "../../types.js";
+import { encodeString } from "../utils.js";
+
 
 interface RobloxAuthConfig extends OAuthBaseProviderConfig {
   /**
    * Domain is required to create custom email addresses, since Roblox does not share users’ actual email addresses for security and privacy reasons. The plugin automatically generates a unique custom email address for each new signup.
    */
   emailDomain: string
-}
-
-const authorization_server: AuthorizationServer = {
-  issuer: "https://apis.roblox.com/oauth/",
-  authorization_endpoint: "https://apis.roblox.com/oauth/v1/authorize",
-  token_endpoint: "https://apis.roblox.com/oauth/v1/token",
-  userinfo_endpoint: "https://apis.roblox.com/oauth/v1/userinfo",
+  skip_email_verification?: boolean | undefined
 }
 
 /**
- * Add Roblox OAuth2 Provider
- *
- * #### Callback or Redirect URL pattern
+ * Add Roblox OIDC Provider
  *
  * ```
  * https://example.com/api/{name}/oauth/callback/roblox
@@ -40,17 +34,16 @@ const authorization_server: AuthorizationServer = {
  *  authPlugin({
  *    providers:[
  *      RobloxAuthProvider({
- *          client_id: process.env.ROBOLOX_CLIENT_ID as string,
- *          client_secret: process.env.ROBOLOR_CLIENT_SECRET as string,
+ *          client_id: process.env.ROBLOX_CLIENT_ID as string,
+ *          client_secret: process.env.ROBLOX_CLIENT_SECRET as string,
  *      })
  *    ]
  *  })
  * ]
  * ```
- *
  */
 
-function RobloxAuthProvider(config: RobloxAuthConfig): OAuth2ProviderConfig {
+function RobloxAuthProvider(config: RobloxAuthConfig): OIDCProviderConfig {
   const { overrideScope, ...restConfig } = config
 
   const domainRegex = /^(?!-)(?:[a-zA-Z0-9-]{1,63}\.)+[a-zA-Z]{2,63}$/;
@@ -60,14 +53,20 @@ function RobloxAuthProvider(config: RobloxAuthConfig): OAuth2ProviderConfig {
     throw new InvalidDomain()
   }
 
+  const stateCode = encodeString(config.client_id).toString()
+
+
   return {
     ...restConfig,
     id: "roblox",
     scope: overrideScope ?? "openid email profile",
-    authorization_server,
+    issuer: "https://apis.roblox.com/oauth/",
     name: "Roblox",
-    algorithm: "oauth2",
+    algorithm: "oidc",
     kind: "oauth",
+    params: {
+      state: `state-${stateCode}`,
+    },
     profile: (profile): AccountInfo => {
       return {
         sub: profile.sub as string,

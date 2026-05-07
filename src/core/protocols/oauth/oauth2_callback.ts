@@ -1,5 +1,6 @@
 import * as oauth from "oauth4webapi"
 import { parseCookies, type PayloadRequest } from "payload"
+import { generateProviderCustomEmail } from "../../../providers/utils.js"
 import type { OAuth2ProviderConfig } from "../../../types.js"
 import { MissingOrInvalidSession } from "../../errors/consoleErrors.js"
 import { getCallbackURL } from "../../utils/cb.js"
@@ -78,9 +79,12 @@ export async function OAuth2Callback(
     token_result.access_token,
   )
   const userInfo = (await userInfoResponse.json()) as Record<string, string>
-
+  const email = providerConfig.emailDomain ? generateProviderCustomEmail(providerConfig.name.toLowerCase().trim()
+    .replace(/[^a-z0-9\s-]/g, "")
+    .replace(/\s+/g, "-")
+    .replace(/-+/g, "-"), providerConfig.emailDomain) : userInfo.email
   const userData = {
-    email: userInfo.email,
+    email,
     name: userInfo.name ?? "",
     sub: userInfo.sub,
     scope:

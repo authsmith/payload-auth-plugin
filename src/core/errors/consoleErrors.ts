@@ -130,3 +130,9 @@ export class WrongClientUsage extends PluginError {
     super("Using client only code in server side")
   }
 }
+
+export class InvalidDomain extends PluginError {
+  constructor() {
+    super("Invalid domain format")
+  }
+}

@@ -1,10 +1,11 @@
 import * as oauth from "oauth4webapi"
 import { parseCookies, type PayloadRequest } from "payload"
+import { generateProviderCustomEmail } from "../../../providers/utils.js"
 import type { OIDCProviderConfig } from "../../../types.js"
 import {
   InternalServerError,
   MissingEmailAPIError,
-  UnVerifiedAccountAPIError,
+  UnVerifiedAccountAPIError
 } from "../../errors/apiErrors.js"
 import { MissingOrInvalidSession } from "../../errors/consoleErrors.js"
 import { getCallbackURL } from "../../utils/cb.js"
@@ -104,8 +105,13 @@ export async function OIDCCallback(
     claims?.sub,
     userInfoResponse,
   )
+  const email = providerConfig.emailDomain && !result.email ? generateProviderCustomEmail(providerConfig.name.toLowerCase().trim()
+    .replace(/[^a-z0-9\s-]/g, "")
+    .replace(/\s+/g, "-")
+    .replace(/-+/g, "-"), providerConfig.emailDomain) : result.email
 
-  if (!result.email) {
+
+  if (!email) {
     return new MissingEmailAPIError()
   }
 
@@ -114,7 +120,7 @@ export async function OIDCCallback(
   }
 
   const userData = {
-    email: result.email,
+    email,
     name: result.name ?? "",
     sub: result.sub,
     scope:

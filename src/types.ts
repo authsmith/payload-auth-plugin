@@ -50,6 +50,12 @@ interface OAuthProviderOutput {
   scope: string
 
   /**
+   * Email Domain to create custom email addresses
+   * @type {string}
+   */
+  emailDomain?: string | undefined
+
+  /**
    * Profile callback that returns account information requried to link with users
    *
    * @type {(
@@ -76,11 +82,12 @@ export interface OAuthBaseProviderConfig {
    * Override default scope of the provider
    */
   overrideScope?: string | undefined
+
 }
 
 export interface OIDCProviderConfig
   extends OAuthProviderOutput,
-    OAuthBaseProviderConfig {
+  OAuthBaseProviderConfig {
   issuer: string
   algorithm: "oidc"
   kind: "oauth"
@@ -89,7 +96,7 @@ export interface OIDCProviderConfig
 
 export interface OAuth2ProviderConfig
   extends OAuthProviderOutput,
-    OAuthBaseProviderConfig {
+  OAuthBaseProviderConfig {
   authorization_server: AuthorizationServer
   algorithm: "oauth2"
   kind: "oauth"
