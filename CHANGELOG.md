@@ -2,11 +2,21 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.7.10] - 2026-05-07
+
+### 🚀 Features
+
+- Custom email support
+
 ## [0.7.9] - 2026-05-04
 
 ### 🐛 Bug Fixes
 
 - Use payload updat function
+
+### ⚙️ Miscellaneous Tasks
+
+- Release v0.7.9
 
 ## [0.7.8] - 2026-05-03
 
