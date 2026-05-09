@@ -1,5 +1,6 @@
 import * as jose from "jose"
 import type {
+  BasePayload,
   JsonObject,
   PayloadRequest,
   SanitizedCollectionConfig,
@@ -17,6 +18,49 @@ import {
 
 import { v4 as uuid } from "uuid"
 import { removeExpiredSessions } from "../../utils/session.js"
+
+
+async function _createUser({ email, name, collections, payload, allowOAuthAutoSignUp }: {
+  email: string, name: string, collections: {
+    usersCollection: string
+    accountsCollection: string
+  }, payload: BasePayload, allowOAuthAutoSignUp: boolean
+}) {
+
+  const userRecords = await payload.find({
+    collection: collections.usersCollection,
+    where: {
+      email: {
+        equals: email,
+      },
+    },
+  })
+  let userRecord: (JsonObject & TypeWithID) | null
+  if (userRecords.docs.length === 1) {
+    userRecord = userRecords.docs[0]
+  } else if (allowOAuthAutoSignUp) {
+    const data: Record<string, unknown> = {
+      email,
+      name,
+    }
+    const hasAuthEnabled = Boolean(
+      payload.collections[collections.usersCollection].config.auth,
+    )
+    if (hasAuthEnabled) {
+      data.password = jose.base64url.encode(
+        crypto.getRandomValues(new Uint8Array(16)),
+      )
+    }
+    const userRecords = await payload.create({
+      collection: collections.usersCollection,
+      data,
+    })
+    userRecord = userRecords
+  } else {
+    return null
+  }
+  return userRecord
+}
 export async function OAuthAuthentication(
   pluginType: string,
   collections: {
@@ -56,51 +100,7 @@ export async function OAuthAuthentication(
   } = account
   const { payload } = request
 
-  const email = _email.toLowerCase()
-
-  const userRecords = await payload.find({
-    collection: collections.usersCollection,
-    where: {
-      email: {
-        equals: email,
-      },
-    },
-  })
-  let userRecord: JsonObject & TypeWithID
-  if (userRecords.docs.length === 1) {
-    userRecord = userRecords.docs[0]
-  } else if (allowOAuthAutoSignUp) {
-    const data: Record<string, unknown> = {
-      email,
-      name,
-    }
-    const hasAuthEnabled = Boolean(
-      payload.collections[collections.usersCollection].config.auth,
-    )
-    if (hasAuthEnabled) {
-      data.password = jose.base64url.encode(
-        crypto.getRandomValues(new Uint8Array(16)),
-      )
-    }
-    const userRecords = await payload.create({
-      collection: collections.usersCollection,
-      data,
-    })
-    userRecord = userRecords
-  } else {
-    return new UserNotFoundAPIError()
-  }
-
-  const data: Record<string, unknown> = {
-    scope,
-    name: name,
-    picture: picture,
-    issuerName: issuer,
-    access_token,
-    refresh_token,
-    expires_in,
-  }
-
+  let userRecord: (JsonObject & TypeWithID) | null = null
   const accountRecords = await payload.find({
     collection: collections.accountsCollection,
     where: {
@@ -108,20 +108,65 @@ export async function OAuthAuthentication(
     },
   })
   if (accountRecords.docs && accountRecords.docs.length === 1) {
+    const accountUserRecords = await payload.find({
+      collection: collections.usersCollection,
+      where: {
+        id: { equals: typeof accountRecords.docs[0].user === "string" ? accountRecords.docs[0].user : accountRecords.docs[0].user.id }
+      }
+    })
+    if (accountUserRecords.docs.length === 0) {
+      userRecord = await _createUser({
+        email: _email.toLowerCase(),
+        name,
+        payload,
+        collections,
+        allowOAuthAutoSignUp
+      })
+    } else {
+      userRecord = accountUserRecords.docs[0]
+    }
     await payload.update({
       collection: collections.accountsCollection,
       id: accountRecords.docs[0].id,
-      data,
+      data: {
+        scope,
+        name: name,
+        picture: picture,
+        issuerName: issuer,
+        access_token,
+        refresh_token,
+        expires_in,
+      },
     })
-  } else {
-    data.sub = sub
-    data.user = userRecord.id
-    await payload.create({
-      collection: collections.accountsCollection,
-      data,
-    })
-  }
 
+  } else {
+    userRecord = await _createUser({
+      email: _email.toLowerCase(),
+      name,
+      payload,
+      collections,
+      allowOAuthAutoSignUp
+    })
+    if (userRecord) {
+      await payload.create({
+        collection: collections.accountsCollection,
+        data: {
+          scope,
+          name: name,
+          picture: picture,
+          issuerName: issuer,
+          access_token,
+          refresh_token,
+          expires_in,
+          sub,
+          user: userRecord.id
+        },
+      })
+    }
+  }
+  if (!userRecord) {
+    return new UserNotFoundAPIError()
+  }
   let cookies: string[] = []
 
   const collectionConfig = payload.config.collections.find(
@@ -165,7 +210,7 @@ export async function OAuthAuthentication(
       secret,
       {
         id: userRecord.id,
-        email: email,
+        email: _email.toLowerCase(),
         sid: sessionID,
         collection: collections.usersCollection,
       },
