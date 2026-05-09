@@ -2,11 +2,25 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.7.11] - 2026-05-09
+
+### 🚀 Features
+
+- Adds account based user creation
+
+### ⚙️ Miscellaneous Tasks
+
+- Release v0.7.11
+
 ## [0.7.10] - 2026-05-07
 
 ### 🚀 Features
 
 - Custom email support
+
+### ⚙️ Miscellaneous Tasks
+
+- Release 0.7.10
 
 ## [0.7.9] - 2026-05-04
 
