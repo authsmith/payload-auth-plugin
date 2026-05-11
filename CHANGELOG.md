@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.7.12] - 2026-05-11
+
+### 🚀 Features
+
+- Support saveToJWT
+
 ## [0.7.11] - 2026-05-09
 
 ### 🚀 Features
@@ -10,6 +16,7 @@ All notable changes to this project will be documented in this file.
 
 ### ⚙️ Miscellaneous Tasks
 
+- Release v0.7.11
 - Release v0.7.11
 
 ## [0.7.10] - 2026-05-07
