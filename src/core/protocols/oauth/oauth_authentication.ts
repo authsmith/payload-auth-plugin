@@ -17,6 +17,7 @@ import {
 } from "../../utils/cookies.js"
 
 import { v4 as uuid } from "uuid"
+import { traverseFields } from "../../utils/collection.js"
 import { removeExpiredSessions } from "../../utils/session.js"
 
 
@@ -201,6 +202,17 @@ export async function OAuthAuthentication(
       data: userRecord,
     })
   }
+  const cookieResult = {
+    id: userRecord.id,
+    email: _email.toLowerCase(),
+    sid: sessionID,
+    collection: collections.usersCollection,
+  }
+  traverseFields({
+    data: userRecord,
+    "fields": collectionConfig.fields,
+    result: cookieResult
+  })
   const cookieName = useAdmin
     ? `${payload.config.cookiePrefix}-token`
     : `__${pluginType}-${APP_COOKIE_SUFFIX}`
@@ -208,12 +220,7 @@ export async function OAuthAuthentication(
     ...(await createSessionCookies(
       cookieName,
       secret,
-      {
-        id: userRecord.id,
-        email: _email.toLowerCase(),
-        sid: sessionID,
-        collection: collections.usersCollection,
-      },
+      cookieResult,
       useAdmin ? collectionConfig?.auth.tokenExpiration : undefined,
       collectionConfig.auth as SanitizedCollectionConfig["auth"] || false,
     )),
