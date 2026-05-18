@@ -6,6 +6,7 @@ type TraverseFieldsArgs = {
   fields: (Field | TabAsField)[]
   result: Record<string, unknown>
 }
+
 export const traverseFields = ({
   data,
   // parent,

@@ -1,4 +1,5 @@
 import type { AuthorizationServer } from "oauth4webapi"
+import { AuthOperationsFromCollectionSlug, Collection, PayloadRequest, StringKeyOf } from "payload"
 
 export enum ErrorKind {
   NotFound = "NotFound",
@@ -157,4 +158,31 @@ export type UserSession = {
   createdAt: Date | string
   expiresAt: Date | string
   id: string
+}
+
+export interface PayloadTypesShape {
+  auth: Record<string, unknown>
+  blocks: Record<string, unknown>
+  collections: Record<string, unknown>
+  collectionsJoins: Record<string, unknown>
+  collectionsSelect: Record<string, unknown>
+  db: { defaultIDType: unknown }
+  fallbackLocale: unknown
+  globals: Record<string, unknown>
+  globalsSelect: Record<string, unknown>
+  jobs: unknown
+  locale: unknown
+  user: unknown
+  widgets?: Record<string, unknown>
+}
+
+export type AuthCollectionSlug<T extends PayloadTypesShape = any> = StringKeyOf<T['auth']>
+
+export type Arguments<TSlug extends AuthCollectionSlug> = {
+  collection: Collection
+  data: AuthOperationsFromCollectionSlug<TSlug>['login']
+  depth?: number
+  overrideAccess?: boolean
+  req: PayloadRequest
+  showHiddenFields?: boolean
 }

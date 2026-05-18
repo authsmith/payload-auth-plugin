@@ -1,45 +1,39 @@
 import * as jose from "jose"
-import type {
-  BasePayload,
-  JsonObject,
-  PayloadRequest,
-  SanitizedCollectionConfig,
-  TypeWithID,
+import {
+  generatePayloadCookie,
+  getFieldsToSign,
+  jwtSign,
+  TypedUser,
+  type JsonObject,
+  type PayloadRequest,
+  type TypeWithID
 } from "payload"
-import { APP_COOKIE_SUFFIX } from "../../../constants.js"
 import {
   MissingCollection,
   UserNotFoundAPIError,
 } from "../../errors/apiErrors.js"
-import {
-  createSessionCookies,
-  invalidateOAuthCookies,
-} from "../../utils/cookies.js"
 
 import { v4 as uuid } from "uuid"
-import { traverseFields } from "../../utils/collection.js"
 import { removeExpiredSessions } from "../../utils/session.js"
 
 
-async function _createUser({ email, name, collections, payload, allowOAuthAutoSignUp }: {
+async function _createUser({ email, name, collections, request, allowOAuthAutoSignUp }: {
   email: string, name: string, collections: {
     usersCollection: string
     accountsCollection: string
-  }, payload: BasePayload, allowOAuthAutoSignUp: boolean
+  }, request: PayloadRequest, allowOAuthAutoSignUp: boolean
 }) {
-
-  const userRecords = await payload.find({
+  const { payload } = request
+  let userRecord = await payload.db.findOne({
     collection: collections.usersCollection,
     where: {
       email: {
         equals: email,
       },
     },
+    req: request,
   })
-  let userRecord: (JsonObject & TypeWithID) | null
-  if (userRecords.docs.length === 1) {
-    userRecord = userRecords.docs[0]
-  } else if (allowOAuthAutoSignUp) {
+  if (!userRecord && allowOAuthAutoSignUp) {
     const data: Record<string, unknown> = {
       email,
       name,
@@ -52,11 +46,11 @@ async function _createUser({ email, name, collections, payload, allowOAuthAutoSi
         crypto.getRandomValues(new Uint8Array(16)),
       )
     }
-    const userRecords = await payload.create({
+    userRecord = await payload.db.create({
       collection: collections.usersCollection,
       data,
+      returning: true
     })
-    userRecord = userRecords
   } else {
     return null
   }
@@ -100,33 +94,26 @@ export async function OAuthAuthentication(
     claims,
   } = account
   const { payload } = request
-
+  const trxID = await payload.db.beginTransaction()
   let userRecord: (JsonObject & TypeWithID) | null = null
-  const accountRecords = await payload.find({
+  const accountRecords = await payload.db.find({
     collection: collections.accountsCollection,
     where: {
       sub: { equals: sub },
     },
-  })
+    req: request,
+  }) as { docs: (JsonObject & TypeWithID)[] }
   if (accountRecords.docs && accountRecords.docs.length === 1) {
-    const accountUserRecords = await payload.find({
-      collection: collections.usersCollection,
-      where: {
-        id: { equals: typeof accountRecords.docs[0].user === "string" ? accountRecords.docs[0].user : accountRecords.docs[0].user.id }
-      }
-    })
-    if (accountUserRecords.docs.length === 0) {
-      userRecord = await _createUser({
-        email: _email.toLowerCase(),
-        name,
-        payload,
-        collections,
-        allowOAuthAutoSignUp
+    if (accountRecords.docs[0].user) {
+      userRecord = await payload.db.findOne({
+        collection: collections.usersCollection,
+        where: {
+          id: { equals: accountRecords.docs[0].user },
+        },
+        req: request,
       })
-    } else {
-      userRecord = accountUserRecords.docs[0]
     }
-    await payload.update({
+    await payload.db.updateOne({
       collection: collections.accountsCollection,
       id: accountRecords.docs[0].id,
       data: {
@@ -138,18 +125,19 @@ export async function OAuthAuthentication(
         refresh_token,
         expires_in,
       },
+      req: request
     })
 
   } else {
     userRecord = await _createUser({
       email: _email.toLowerCase(),
       name,
-      payload,
+      request,
       collections,
       allowOAuthAutoSignUp
     })
     if (userRecord) {
-      await payload.create({
+      await payload.db.create({
         collection: collections.accountsCollection,
         data: {
           scope,
@@ -162,18 +150,25 @@ export async function OAuthAuthentication(
           sub,
           user: userRecord.id
         },
+        req: request,
       })
     }
   }
   if (!userRecord) {
+    if (trxID) {
+      await payload.db.rollbackTransaction(trxID)
+    }
     return new UserNotFoundAPIError()
   }
-  let cookies: string[] = []
+
 
   const collectionConfig = payload.config.collections.find(
     (collection) => collection.slug === collections.usersCollection,
   )
   if (!collectionConfig) {
+    if (trxID) {
+      await payload.db.rollbackTransaction(trxID)
+    }
     return new MissingCollection()
   }
 
@@ -191,44 +186,114 @@ export async function OAuthAuthentication(
       userRecord.sessions = removeExpiredSessions(userRecord.sessions)
       userRecord.sessions.push(session)
     }
-    userRecord.claims = claims
-    await payload.update({
-      where: {
-        id: {
-          equals: userRecord.id
-        }
-      },
-      collection: collections.usersCollection,
+    userRecord.updatedAt = null
+    const r = await payload.db.updateOne({
+      id: userRecord.id,
+      collection: collectionConfig.slug,
       data: userRecord,
+      req: request,
+      returning: true,
     })
+    userRecord.collection = collectionConfig.slug
+    userRecord._strategy = 'local-jwt'
   }
-  const cookieResult = {
-    id: userRecord.id,
-    email: _email.toLowerCase(),
-    sid: sessionID,
+
+  const claimUser = await payload.db.findOne({
     collection: collections.usersCollection,
-  }
-  traverseFields({
-    data: userRecord,
-    "fields": collectionConfig.fields,
-    result: cookieResult
+    where: {
+      id: {
+        equals: userRecord.id,
+      },
+    },
+    req: request,
   })
-  const cookieName = useAdmin
-    ? `${payload.config.cookiePrefix}-token`
-    : `__${pluginType}-${APP_COOKIE_SUFFIX}`
-  cookies = [
-    ...(await createSessionCookies(
-      cookieName,
-      secret,
-      cookieResult,
-      useAdmin ? collectionConfig?.auth.tokenExpiration : undefined,
-      collectionConfig.auth as SanitizedCollectionConfig["auth"] || false,
-    )),
-  ]
-  cookies = invalidateOAuthCookies(cookies)
+  const fieldsToSign = getFieldsToSign({
+    user: claimUser as TypedUser,
+    email: _email.toLowerCase(),
+    sid: sessionID ?? undefined,
+    collectionConfig,
+  })
+
+  if (collectionConfig.hooks?.beforeLogin?.length) {
+    for (const hook of collectionConfig.hooks.beforeLogin) {
+      userRecord =
+        (await hook({
+          collection: collectionConfig,
+          context: request.context,
+          req: request,
+          user: claimUser as TypedUser,
+        })) || userRecord
+    }
+  }
+
+  const { exp, token } = await jwtSign({
+    fieldsToSign,
+    secret,
+    tokenExpiration: collectionConfig.auth.tokenExpiration,
+  })
+
+  if (collectionConfig.hooks?.afterLogin?.length) {
+    for (const hook of collectionConfig.hooks.afterLogin) {
+      userRecord =
+        (await hook({
+          collection: collectionConfig,
+          context: request.context,
+          req: request,
+          token,
+          user: userRecord,
+        })) || userRecord
+    }
+  }
+
+  if (collectionConfig.hooks?.afterRead?.length) {
+    for (const hook of collectionConfig.hooks.afterRead) {
+      userRecord =
+        (await hook({
+          collection: collectionConfig,
+          context: request.context,
+          doc: userRecord,
+          req: request,
+        })) || userRecord
+    }
+  }
+
   const successRedirectionURL = new URL(
     `${payload.config.serverURL}${successRedirectPath}`,
   )
+
+  let result = {
+    exp,
+    token,
+    user: userRecord,
+  }
+
+  // const args: Arguments<any> = {
+  //   collection: payload.collections[collections.usersCollection],
+  //   data: {
+  //     email: _email.toLowerCase(),
+  //     password: userRecord?.password,
+  //     // username: userRecord?.username,
+  //   },
+  //   depth: 0,
+  //   req: isolateObjectProperty(request, 'transactionID'),
+  // }
+  // result = await buildAfterOperation({
+  //   args,
+  //   collection: collectionConfig,
+  //   operation: 'login',
+  //   result,
+  // })
+
+  const cookie = generatePayloadCookie({
+    collectionAuthConfig: collectionConfig.auth,
+    cookiePrefix: useAdmin
+      ? `${payload.config.cookiePrefix}`
+      : `__${pluginType}`,
+    token: result.token,
+  })
+  if (trxID) {
+    await payload.db.commitTransaction(trxID)
+  }
   const res = new Response(null, {
     status: 302,
     headers: {
@@ -236,9 +301,7 @@ export async function OAuthAuthentication(
     },
   })
 
-  for (const c of cookies) {
-    res.headers.append("Set-Cookie", c)
-  }
+  res.headers.append("Set-Cookie", cookie)
 
   return res
 }
