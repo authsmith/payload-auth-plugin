@@ -1,6 +1,6 @@
 {
   "name": "payload-auth-plugin",
-  "version": "0.7.12",
+  "version": "0.7.13",
   "type": "module",
   "sideEffects": false,
   "author": "Sourab Pramanik<shubpramanik241@gmail.com>",

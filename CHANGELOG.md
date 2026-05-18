@@ -2,11 +2,21 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.7.13] - 2026-05-18
+
+### 🐛 Bug Fixes
+
+- Use transactions for db ops
+
 ## [0.7.12] - 2026-05-11
 
 ### 🚀 Features
 
 - Support saveToJWT
+
+### ⚙️ Miscellaneous Tasks
+
+- Release v0.7.12
 
 ## [0.7.11] - 2026-05-09
 
