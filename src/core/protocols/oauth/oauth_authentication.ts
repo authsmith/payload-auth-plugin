@@ -51,9 +51,8 @@ async function _createUser({ email, name, collections, request, allowOAuthAutoSi
       data,
       returning: true
     })
-  } else {
-    return null
-  }
+  } 
+
   return userRecord
 }
 export async function OAuthAuthentication(
